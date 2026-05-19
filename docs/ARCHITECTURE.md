@@ -1,0 +1,133 @@
+# Architektur
+
+## Ziel
+
+Einen modularen, menschlich beaufsichtigten Wiederverkaufsassistenten bauen, der sich von der Listing-Generierung hin zu konformen Marketplace-Integrationen weiterentwickeln kann.
+
+## Empfohlene Architektur
+
+```text
+apps/web
+  Benutzeroberflaeche
+
+apps/api
+  API-Routen, Jobs, Authentifizierung
+
+packages/db
+  Datenbankschema und Migrationen
+
+packages/shared
+  Geteilte Typen, Schemas, Konstanten
+
+packages/vision
+  Provider fuer Bildanalyse und Normalisierung
+
+packages/scoring
+  Entscheidungslogik fuer verkaufen/buendeln/verschenken
+
+packages/listings
+  Listing-Generierung, Templates, plattformspezifische Formatierung
+
+packages/marketplaces
+  Marketplace-Provider-Interfaces
+
+packages/automation
+  Playwright-basierte Teilautomatisierung
+
+packages/testing
+  Fixtures und Test-Helfer
+
+docs
+  Produkt- und Engineering-Dokumentation
+```
+
+## Zentrale Domain-Objekte
+
+### Project
+
+Eine Ausmist-Sitzung oder ein Batch.
+
+Beispiele:
+
+- Kellerkiste
+- Kinderkleidung Fruehjahr 2026
+- Garagenregal
+- Umzugsverkauf
+
+### Asset
+
+Ein hochgeladenes Foto oder Video.
+
+### ItemCandidate
+
+Ein vom Modell erkannter moeglicher Gegenstand vor der Nutzerbestaetigung.
+
+### InventoryItem
+
+Ein vom Nutzer gepruefter Gegenstand.
+
+### Bundle
+
+Eine Gruppe von Gegenstaenden, die gemeinsam verkauft werden soll oder vom System dafuer empfohlen wird.
+
+### Recommendation
+
+Eine Entscheidung fuer verkaufen/buendeln/verschenken/spenden/recyceln.
+
+### ListingDraft
+
+Ein marktplatzreifer Entwurf, der aus einem Gegenstand oder Bundle erzeugt wurde.
+
+## Provider-Interfaces
+
+Nutze fuer externe Abhaengigkeiten Provider-Interfaces.
+
+Beispiele:
+
+```text
+VisionProvider
+PricingProvider
+ListingGenerator
+MarketplaceProvider
+AutomationProvider
+StorageProvider
+```
+
+## KI-Grenze
+
+Alle KI-Systeme sitzen hinter Provider-Interfaces.
+
+Die Anwendung sollte nicht im gesamten Code direkt von einem einzelnen Modellanbieter abhaengen.
+
+## Datenfluss
+
+```text
+Fotos hochladen
+-> Asset-Eintraege anlegen
+-> Assets analysieren
+-> ItemCandidate-Eintraege anlegen
+-> Nutzer prueft Kandidaten
+-> InventoryItem-Eintraege anlegen
+-> Inventargegenstaende bewerten
+-> Recommendation-Eintraege anlegen
+-> ListingDraft-Eintraege erzeugen
+-> exportieren oder Marketplace-Formulare vorausfuellen
+```
+
+## Strategie fuer Marketplace-Integrationen
+
+Stufe 1:
+
+- Listing-Entwuerfe kopieren/exportieren.
+
+Stufe 2:
+
+- Browser-Vorausfuellen mit Nutzerbestaetigung.
+
+Stufe 3:
+
+- Offizielle API-Integration, falls verfuegbar.
+
+## Designprinzip
+
+Marketplace-Integrationen sollten austauschbar sein. Der Kernwert des Produkts darf nicht von einem einzelnen Marketplace abhaengen.

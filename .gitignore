@@ -1,0 +1,72 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+.next/
+dist/
+build/
+out/
+
+# Turbo
+.turbo/
+
+# Environment variables — never commit, use .env.example instead
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# User-uploaded photos — sensitive home content, never commit
+uploads/
+storage/local/
+public/uploads/
+apps/*/uploads/
+apps/*/storage/
+
+# Playwright — session state and browser credentials must not be committed
+playwright/.auth/
+playwright-report/
+test-results/
+**/.playwright/
+**/playwright-state.json
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Prisma generated client (reproducible via prisma generate)
+packages/db/generated/
+apps/*/node_modules/.prisma/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS / Windows WSL artifacts
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
+
+# Editor
+.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing
+coverage/
+.nyc_output/
