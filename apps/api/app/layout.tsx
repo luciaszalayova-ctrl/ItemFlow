@@ -1,0 +1,21 @@
+import type { ReactNode } from "react";
+
+import "./globals.css";
+
+export const metadata = {
+  title: "ItemFlow API",
+  description: "API application shell for ItemFlow."
+};
+
+type RootLayoutProps = {
+  children: ReactNode;
+};
+
+export default function RootLayout({ children }: RootLayoutProps) {
+  return (
+    <html lang="de">
+      <body>{children}</body>
+    </html>
+  );
+}
+

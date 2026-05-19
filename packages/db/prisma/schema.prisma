@@ -1,0 +1,212 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum ProjectStatus {
+  active
+  archived
+  deleted
+}
+
+enum CandidateStatus {
+  pending
+  accepted
+  rejected
+  merged
+  split
+}
+
+enum InventoryItemStatus {
+  draft
+  ready_for_scoring
+  scored
+  listing_created
+  handled
+}
+
+enum BundleStatus {
+  suggested
+  accepted
+  rejected
+  listing_created
+}
+
+enum RecommendationAction {
+  sell_individually
+  bundle
+  give_away
+  donate
+  recycle_dispose
+  needs_review
+}
+
+enum ConfidenceLevel {
+  high
+  medium
+  low
+}
+
+enum ListingStatus {
+  draft
+  reviewed
+  exported
+  prefilled
+  published_external
+  archived
+}
+
+enum MarketplaceActionType {
+  export
+  copy
+  prefill_started
+  prefill_completed
+  api_submission
+  publish_confirmed
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  createdAt DateTime  @default(now())
+  settings  Json?
+  projects  Project[]
+}
+
+model Project {
+  id              String           @id @default(cuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title           String
+  description     String?
+  status          ProjectStatus    @default(active)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  assets          Asset[]
+  candidates      ItemCandidate[]
+  items           InventoryItem[]
+  bundles         Bundle[]
+  recommendations Recommendation[]
+  listingDrafts   ListingDraft[]
+}
+
+model Asset {
+  id              String          @id @default(cuid())
+  projectId       String
+  project         Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  storageKey      String
+  mimeType        String
+  fileName        String
+  sizeBytes       Int
+  width           Int?
+  height          Int?
+  durationSeconds Float?
+  createdAt       DateTime        @default(now())
+  candidates      ItemCandidate[]
+}
+
+model ItemCandidate {
+  id                 String          @id @default(cuid())
+  projectId          String
+  project            Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assetId            String
+  asset              Asset           @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  rawLabel           String
+  normalizedName     String
+  category           String
+  attributesJson     Json            @default("{}")
+  confidence         Float
+  boundingBoxJson    Json?
+  rawModelOutputJson Json            @default("{}")
+  status             CandidateStatus @default(pending)
+  createdAt          DateTime        @default(now())
+}
+
+model InventoryItem {
+  id                 String              @id @default(cuid())
+  projectId          String
+  project            Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title              String
+  category           String
+  brand              String?
+  model              String?
+  condition          String?
+  quantity           Int                 @default(1)
+  description        String?
+  defects            String?
+  completeness       String?
+  sourceCandidateIds String[]
+  status             InventoryItemStatus @default(draft)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+}
+
+model Bundle {
+  id        String       @id @default(cuid())
+  projectId String
+  project   Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title     String
+  itemIds   String[]
+  rationale String?
+  status    BundleStatus @default(suggested)
+  createdAt DateTime     @default(now())
+}
+
+// targetType: "item" | "bundle"
+// targetId: the InventoryItem.id or Bundle.id this recommendation refers to
+model Recommendation {
+  id                 String               @id @default(cuid())
+  projectId          String
+  project            Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  targetType         String
+  targetId           String
+  action             RecommendationAction
+  expectedPriceCents Int?
+  minimumPriceCents  Int?
+  effortScore        Int?
+  demandScore        Int?
+  confidence         ConfidenceLevel
+  rationale          String?
+  createdAt          DateTime             @default(now())
+}
+
+// targetType: "item" | "bundle"
+model ListingDraft {
+  id                String                 @id @default(cuid())
+  projectId         String
+  project           Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  targetType        String
+  targetId          String
+  platform          String
+  title             String
+  description       String
+  priceCents        Int
+  minimumPriceCents Int?
+  category          String?
+  shippingMode      String?
+  pickupOnly        Boolean                @default(true)
+  photoAssetIds     String[]
+  status            ListingStatus          @default(draft)
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  actionLogs        MarketplaceActionLog[]
+}
+
+model MarketplaceActionLog {
+  id             String                @id @default(cuid())
+  listingDraftId String
+  listingDraft   ListingDraft          @relation(fields: [listingDraftId], references: [id], onDelete: Cascade)
+  marketplace    String
+  actionType     MarketplaceActionType
+  status         String
+  detailsJson    Json?
+  createdAt      DateTime              @default(now())
+}
