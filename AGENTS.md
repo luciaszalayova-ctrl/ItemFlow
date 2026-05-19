@@ -256,6 +256,20 @@ Regeln:
 - Kein Force-Push auf geteilte Branches
 - Kein `--no-verify` ohne explizite Begruendung
 
+### Zustaendigkeiten Git
+
+**Claude Code:**
+- Legt den Feature-Branch vor der Codex-Übergabe an
+- Bereitet nach approved Review die exakten Commit- und Merge-Befehle vor
+
+**Codex:**
+- Arbeitet auf dem bereits angelegten Branch
+- Erstellt keine neuen Branches selbst
+
+**Nutzer:**
+- Fuehrt die vorbereiteten Befehle im Terminal aus
+- Entscheidet ueber den Merge
+
 ---
 
 ## Projektinfrastruktur fuer Agenten

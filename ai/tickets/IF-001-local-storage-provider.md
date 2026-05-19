@@ -2,7 +2,7 @@
 
 Erstellt: 2026-05-19  
 Erstellt von: Claude Code  
-Status: `ready`
+Status: `done`
 
 ---
 

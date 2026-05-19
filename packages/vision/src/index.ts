@@ -21,3 +21,4 @@ export interface VisionProvider {
 
 export type { VisionCandidateRaw }
 export { VisionOutputSchema, VisionCandidateRawSchema } from '@itemflow/shared'
+export { LocalFileSystemStorageProvider } from './providers/local-fs.js'

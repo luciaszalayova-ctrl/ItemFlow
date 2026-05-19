@@ -11,11 +11,15 @@ Anforderung
     ↓
 [Nutzer] Schritt 3: Ticket freigeben
     ↓
+[Claude Code] Schritt 3b: Branch anlegen
+    ↓
 [Codex] Schritt 4: Implementierung auf Feature-Branch
     ↓ STOP wenn Scope unklar oder Annahmen nötig
 [Claude Code] Schritt 5: Review
     ↓ STOP bei kritischen Problemen
-[Nutzer] Schritt 6: Merge-Entscheidung
+[Claude Code] Schritt 5b: Commit-Befehle vorbereiten
+    ↓
+[Nutzer] Schritt 6: Befehle ausführen + Merge-Entscheidung
 ```
 
 ---
@@ -68,6 +72,24 @@ Zu großes Ticket → aufteilen.
 Der Nutzer prüft das Ticket und gibt es frei.
 
 **Keine Implementierung ohne explizite Freigabe.**
+
+---
+
+## Schritt 3b — Branch anlegen (Claude Code)
+
+Nach Freigabe legt Claude Code den Branch an:
+
+```bash
+git checkout main
+git pull
+git checkout -b feature/IF-NNN-kurztitel
+```
+
+Der Codex-Handoff-Prompt enthält dann:
+```text
+Branch ist bereits angelegt: feature/IF-NNN-kurztitel
+Keinen neuen Branch erstellen — direkt auf diesem Branch arbeiten und committen.
+```
 
 ---
 
@@ -129,7 +151,30 @@ Prüfliste:
 
 ---
 
-## Schritt 6 — Merge (Nutzer)
+## Schritt 5b — Commit-Befehle vorbereiten (Claude Code)
 
+Nach approved Review bereitet Claude Code die exakten Befehle vor:
+
+```bash
+# Geänderte Dateien explizit stagen (kein git add -A)
+git add packages/vision/src/providers/local-fs.ts \
+        packages/vision/src/providers/local-fs.test.ts
+
+git commit -m "[IF-NNN] Kurze Beschreibung was gemacht wurde"
+
+# Zurück zu main und mergen
+git checkout main
+git merge --no-ff feature/IF-NNN-kurztitel -m "Merge feature/IF-NNN-kurztitel"
+
+# Branch aufräumen
+git branch -d feature/IF-NNN-kurztitel
+```
+
+Der Nutzer kopiert die Befehle und führt sie im Terminal aus.
+
+---
+
+## Schritt 6 — Befehle ausführen + Merge (Nutzer)
+
+Nutzer führt die vorbereiteten Befehle aus.
 Nur der Nutzer entscheidet über den Merge.
-Claude Code und Codex schlagen vor, der Nutzer entscheidet.
