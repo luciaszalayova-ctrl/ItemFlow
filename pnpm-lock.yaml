@@ -111,6 +111,10 @@ importers:
       '@itemflow/shared':
         specifier: workspace:*
         version: link:../shared
+    devDependencies:
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.19.19)
 
   packages/shared:
     dependencies:

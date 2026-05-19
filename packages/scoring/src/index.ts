@@ -68,3 +68,4 @@ export interface ScoringEngine {
 
 export type { InventoryItem, Bundle, RecommendationAction, ConfidenceLevel }
 export { RecommendationActionSchema, ConfidenceLevelSchema } from '@itemflow/shared'
+export { RuleBasedScoringEngine } from './engines/rule-based.js'
