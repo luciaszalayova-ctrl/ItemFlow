@@ -22,3 +22,4 @@ export interface ListingGenerator {
 
 export type { InventoryItem, Bundle, GeneratedListing, SupportedPlatform }
 export { GeneratedListingSchema, SupportedPlatformSchema } from '@itemflow/shared'
+export { TemplateListingGenerator } from './generators/template-kleinanzeigen.js'

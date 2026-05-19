@@ -6,9 +6,23 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "paths": {
+      "@/*": ["apps/api/*"],
+      "@itemflow/shared": ["packages/shared/src/index.ts"],
+      "@itemflow/shared/*": ["packages/shared/src/*"],
+      "@itemflow/db": ["packages/db/src/index.ts"],
+      "@itemflow/db/*": ["packages/db/src/*"],
+      "@itemflow/vision": ["packages/vision/src/index.ts"],
+      "@itemflow/vision/*": ["packages/vision/src/*"],
+      "@itemflow/scoring": ["packages/scoring/src/index.ts"],
+      "@itemflow/scoring/*": ["packages/scoring/src/*"],
+      "@itemflow/listings": ["packages/listings/src/index.ts"],
+      "@itemflow/listings/*": ["packages/listings/src/*"],
+      "@itemflow/testing": ["packages/testing/src/index.ts"],
+      "@itemflow/testing/*": ["packages/testing/src/*"]
+    }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }
-
