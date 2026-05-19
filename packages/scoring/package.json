@@ -15,10 +15,12 @@
     "build": "tsc --project tsconfig.json",
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "lint": "eslint . --ext .ts --max-warnings=0",
-    "test": "node -e \"console.log('No tests yet for @itemflow/scoring')\""
+    "test": "vitest run"
   },
   "dependencies": {
     "@itemflow/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.8"
   }
 }
-
