@@ -21,6 +21,10 @@ export const InventoryItemSchema = z.object({
   description: z.string().nullable(),
   defects: z.string().nullable(),
   completeness: z.string().nullable(),
+  scoringOverride: z
+    .enum(['sell_single', 'bundle', 'donate', 'gift', 'recycle'])
+    .nullable()
+    .optional(),
   sourceCandidateIds: z.array(z.string()),
   status: InventoryItemStatusSchema,
   createdAt: z.coerce.date(),
@@ -38,5 +42,9 @@ export const UpdateInventoryItemSchema = z.object({
   description: z.string().nullable().optional(),
   defects: z.string().nullable().optional(),
   completeness: z.string().nullable().optional(),
+  scoringOverride: z
+    .enum(['sell_single', 'bundle', 'donate', 'gift', 'recycle'])
+    .nullable()
+    .optional(),
 })
 export type UpdateInventoryItem = z.infer<typeof UpdateInventoryItemSchema>

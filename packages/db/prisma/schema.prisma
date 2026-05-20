@@ -144,6 +144,7 @@ model InventoryItem {
   description        String?
   defects            String?
   completeness       String?
+  scoringOverride    String?
   sourceCandidateIds String[]
   status             InventoryItemStatus @default(draft)
   createdAt          DateTime            @default(now())

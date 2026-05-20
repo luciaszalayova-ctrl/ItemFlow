@@ -17,6 +17,7 @@ const itemSelect = {
   description: true,
   defects: true,
   completeness: true,
+  scoringOverride: true,
   sourceCandidateIds: true,
   status: true,
   createdAt: true,
@@ -58,7 +59,23 @@ export async function GET(
     return Response.json({ error: 'Not found' }, { status: 404 })
   }
 
-  return Response.json({ item })
+  const latestRecommendation = await prisma.recommendation.findFirst({
+    where: {
+      targetType: 'item',
+      targetId: item.id,
+    },
+    orderBy: { createdAt: 'desc' },
+    select: { action: true },
+  })
+
+  return Response.json({
+    item: {
+      ...item,
+      scoringRecommendation: latestRecommendation
+        ? mapRecommendationAction(latestRecommendation.action)
+        : null,
+    },
+  })
 }
 
 export async function PATCH(
@@ -99,10 +116,6 @@ export async function PATCH(
     return Response.json({ error: 'Not found' }, { status: 404 })
   }
 
-  if (item.status !== 'draft' && item.status !== 'ready_for_scoring') {
-    return Response.json({ error: 'Item cannot be edited in current status' }, { status: 409 })
-  }
-
   let body: unknown
   try {
     body = await request.json()
@@ -118,11 +131,55 @@ export async function PATCH(
     )
   }
 
+  const isOverrideOnlyUpdate =
+    parsed.data.scoringOverride !== undefined && Object.keys(parsed.data).length === 1
+
+  if (isOverrideOnlyUpdate) {
+    if (item.status === 'listing_created' || item.status === 'handled') {
+      return Response.json({ error: 'Item cannot be edited in current status' }, { status: 409 })
+    }
+  } else if (item.status !== 'draft' && item.status !== 'ready_for_scoring') {
+    return Response.json({ error: 'Item cannot be edited in current status' }, { status: 409 })
+  }
+
   const updated = await prisma.inventoryItem.update({
     where: { id: item.id },
     data: parsed.data,
     select: itemSelect,
   })
 
-  return Response.json({ item: updated })
+  const latestRecommendation = await prisma.recommendation.findFirst({
+    where: {
+      targetType: 'item',
+      targetId: updated.id,
+    },
+    orderBy: { createdAt: 'desc' },
+    select: { action: true },
+  })
+
+  return Response.json({
+    item: {
+      ...updated,
+      scoringRecommendation: latestRecommendation
+        ? mapRecommendationAction(latestRecommendation.action)
+        : null,
+    },
+  })
+}
+
+function mapRecommendationAction(action: string): string {
+  switch (action) {
+    case 'sell_individually':
+      return 'sell_single'
+    case 'bundle':
+      return 'bundle'
+    case 'donate':
+      return 'donate'
+    case 'give_away':
+      return 'gift'
+    case 'recycle_dispose':
+      return 'recycle'
+    default:
+      return action
+  }
 }
