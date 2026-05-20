@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { auth } from '@/auth'
+import { QuickStartButton } from './QuickStartButton'
 
 export default async function ProjectsPage() {
   const session = await auth()
@@ -57,9 +58,12 @@ export default async function ProjectsPage() {
             </p>
           </div>
 
-          <Link href="/projects/new" style={primaryLinkStyle}>
-            + Neues Projekt
-          </Link>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <QuickStartButton />
+            <Link href="/projects/new" style={secondaryLinkStyle}>
+              + Neues Projekt
+            </Link>
+          </div>
         </div>
 
         {projects.length === 0 ? (
@@ -118,14 +122,14 @@ function formatDate(date: Date) {
   }).format(date)
 }
 
-const primaryLinkStyle = {
+const secondaryLinkStyle = {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   padding: '0.85rem 1rem',
   borderRadius: '999px',
-  background: '#1f6f5f',
-  color: '#ffffff',
+  background: '#efe6d6',
+  color: '#4e463b',
   textDecoration: 'none',
   fontWeight: 700,
 } satisfies React.CSSProperties

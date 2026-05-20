@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { useState } from 'react'
 
 import { type VisionCandidateRaw, VisionCandidateRawSchema } from '@itemflow/shared'
@@ -36,7 +36,6 @@ Optionale Felder:
 
 export default function ChatGptImportPage() {
   const { id: projectId } = useParams<{ id: string }>()
-  const router = useRouter()
   const [json, setJson] = useState('')
   const [parsed, setParsed] = useState<VisionCandidateRaw[] | null>(null)
   const [parseError, setParseError] = useState<string | null>(null)
@@ -44,6 +43,7 @@ export default function ChatGptImportPage() {
   const [error, setError] = useState<string | null>(null)
   const [showPrompt, setShowPrompt] = useState(false)
   const [promptCopied, setPromptCopied] = useState(false)
+  const [summary, setSummary] = useState<{ autoAccepted: number; pendingCount: number } | null>(null)
 
   function handlePreview() {
     const result = parseInput(json)
@@ -76,7 +76,11 @@ export default function ChatGptImportPage() {
       return
     }
 
-    router.push(`/projects/${projectId}/candidates`)
+    const data = (await response.json()) as { autoAccepted: number; pendingCount: number }
+    setSummary({ autoAccepted: data.autoAccepted, pendingCount: data.pendingCount })
+    setJson('')
+    setParsed(null)
+    setSubmitting(false)
   }
 
   async function handleCopyPrompt() {
@@ -219,7 +223,31 @@ export default function ChatGptImportPage() {
           </div>
         </section>
 
-        {parsed ? (
+        {summary ? (
+          <section style={{ ...cardStyle, background: '#f0faf5', borderColor: '#a8d8c2' }}>
+            <h2 style={{ marginTop: 0 }}>Import abgeschlossen</h2>
+            <p style={{ margin: '0 0 1rem', color: '#2d6b4f', lineHeight: 1.6 }}>
+              <strong>{summary.autoAccepted}</strong> automatisch übernommen
+              {summary.pendingCount > 0
+                ? `, ${summary.pendingCount} zur manuellen Prüfung`
+                : ', alle direkt verarbeitet.'}
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              {summary.autoAccepted > 0 ? (
+                <Link href={`/projects/${projectId}/items`} style={primaryLinkStyle}>
+                  Zu den Items →
+                </Link>
+              ) : null}
+              {summary.pendingCount > 0 ? (
+                <Link href={`/projects/${projectId}/candidates`} style={secondaryLinkStyle}>
+                  Candidates prüfen ({summary.pendingCount}) →
+                </Link>
+              ) : null}
+            </div>
+          </section>
+        ) : null}
+
+        {parsed && !summary ? (
           <section style={cardStyle}>
             <div
               style={{
@@ -373,6 +401,30 @@ const secondaryButtonStyle = {
   background: '#efe6d6',
   color: '#4e463b',
   border: 0,
+  fontWeight: 700,
+} satisfies React.CSSProperties
+
+const primaryLinkStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0.8rem 1rem',
+  borderRadius: '999px',
+  background: '#1f6f5f',
+  color: '#ffffff',
+  textDecoration: 'none',
+  fontWeight: 700,
+} satisfies React.CSSProperties
+
+const secondaryLinkStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0.7rem 1rem',
+  borderRadius: '999px',
+  background: '#efe6d6',
+  color: '#4e463b',
+  textDecoration: 'none',
   fontWeight: 700,
 } satisfies React.CSSProperties
 

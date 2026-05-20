@@ -54,11 +54,15 @@ export async function POST(request: Request) {
   const project = await prisma.project.create({
     data: {
       userId: session.user.userId,
-      title: parsed.data.title,
+      title: parsed.data.title ?? generateProjectTitle(),
       description: parsed.data.description ?? null,
     },
     select: projectSelect,
   })
 
   return Response.json({ project }, { status: 201 })
+}
+
+function generateProjectTitle(): string {
+  return `Projekt ${new Date().toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' })}`
 }
