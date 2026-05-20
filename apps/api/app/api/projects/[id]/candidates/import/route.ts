@@ -1,5 +1,6 @@
 import { Prisma, prisma } from '@itemflow/db'
-import { VisionCandidateRawSchema } from '@itemflow/shared'
+import { DEFAULT_AUTO_ACCEPT_THRESHOLD, shouldAutoAccept } from '@itemflow/scoring'
+import { ProjectSettingsSchema, VisionCandidateRawSchema } from '@itemflow/shared'
 import { z } from 'zod'
 
 import { auth } from '@/auth'
@@ -29,7 +30,7 @@ export async function POST(request: Request, context: RouteContext) {
   const { id: projectId } = await context.params
   const project = await prisma.project.findUnique({
     where: { id: projectId },
-    select: { id: true, userId: true, status: true },
+    select: { id: true, userId: true, status: true, settings: true },
   })
 
   if (!project || project.status === 'deleted') {
@@ -44,13 +45,15 @@ export async function POST(request: Request, context: RouteContext) {
   const parsed = ImportBodySchema.safeParse(body)
   if (!parsed.success) {
     return Response.json(
-      {
-        error: 'Ungueltiges Format.',
-        details: parsed.error.flatten(),
-      },
+      { error: 'Ungueltiges Format.', details: parsed.error.flatten() },
       { status: 400 },
     )
   }
+
+  const settingsParsed = ProjectSettingsSchema.safeParse(project.settings ?? {})
+  const threshold = settingsParsed.success
+    ? settingsParsed.data.autoAcceptThreshold
+    : DEFAULT_AUTO_ACCEPT_THRESHOLD
 
   const candidates = await prisma.$transaction(
     parsed.data.candidates.map((candidate) =>
@@ -75,5 +78,44 @@ export async function POST(request: Request, context: RouteContext) {
     ),
   )
 
-  return Response.json({ candidates, count: candidates.length }, { status: 201 })
+  const toAutoAccept = candidates.filter((c) => shouldAutoAccept(c.confidence, threshold))
+
+  if (toAutoAccept.length > 0) {
+    await prisma.$transaction(async (tx) => {
+      for (let i = 0; i < toAutoAccept.length; i++) {
+        const candidate = toAutoAccept[i]!
+        const rawCandidate = parsed.data.candidates.find(
+          (r) => r.rawLabel === candidate.rawLabel && r.normalizedName === candidate.normalizedName,
+        )
+        const brand =
+          typeof rawCandidate?.attributes?.brand === 'string'
+            ? rawCandidate.attributes.brand
+            : null
+
+        await tx.inventoryItem.create({
+          data: {
+            projectId,
+            title: candidate.normalizedName,
+            category: candidate.category,
+            brand,
+            status: 'ready_for_scoring',
+            sourceCandidateIds: [candidate.id],
+          },
+        })
+
+        await tx.itemCandidate.update({
+          where: { id: candidate.id },
+          data: { status: 'accepted' },
+        })
+      }
+    })
+  }
+
+  const autoAccepted = toAutoAccept.length
+  const pendingCount = candidates.length - autoAccepted
+
+  return Response.json(
+    { candidates, count: candidates.length, autoAccepted, pendingCount },
+    { status: 201 },
+  )
 }

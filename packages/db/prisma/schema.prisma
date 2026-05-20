@@ -90,6 +90,7 @@ model Project {
   title           String
   description     String?
   status          ProjectStatus    @default(active)
+  settings        Json?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   assets          Asset[]

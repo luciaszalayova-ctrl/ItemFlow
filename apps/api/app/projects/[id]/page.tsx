@@ -3,6 +3,10 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 
 import { auth } from '@/auth'
+import { DEFAULT_AUTO_ACCEPT_THRESHOLD } from '@itemflow/scoring'
+import { ProjectSettingsSchema } from '@itemflow/shared'
+import { InlineTitleEditor } from './InlineTitleEditor'
+import { ThresholdSetting } from './ThresholdSetting'
 
 type ProjectPageProps = {
   params: Promise<{ id: string }>
@@ -23,6 +27,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       title: true,
       description: true,
       status: true,
+      settings: true,
       createdAt: true,
     },
   })
@@ -30,6 +35,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   if (!project || project.status === 'deleted' || project.userId !== session.user.userId) {
     notFound()
   }
+
+  const settingsParsed = ProjectSettingsSchema.safeParse(project.settings ?? {})
+  const autoAcceptThreshold = settingsParsed.success
+    ? settingsParsed.data.autoAcceptThreshold
+    : DEFAULT_AUTO_ACCEPT_THRESHOLD
 
   const [candidateCount, itemCount, listingCount, bundleCount] = await Promise.all([
     prisma.itemCandidate.count({
@@ -109,7 +119,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
         <header style={{ marginTop: '1.5rem' }}>
           <p style={{ margin: 0, color: '#7b6f5b' }}>Projektübersicht</p>
-          <h1 style={{ marginTop: '0.5rem', marginBottom: '0.75rem' }}>{project.title}</h1>
+          <InlineTitleEditor projectId={project.id} initialTitle={project.title} />
           <p style={{ marginTop: 0, color: '#5c5346', lineHeight: 1.6 }}>
             {project.description ?? 'Keine Beschreibung hinterlegt.'}
           </p>
@@ -125,6 +135,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <StatCard label="Erstellt am" value={formatDate(project.createdAt)} />
           </div>
         </section>
+
+        <ThresholdSetting projectId={project.id} initialThreshold={autoAcceptThreshold} />
 
         <section style={{ marginTop: '2rem' }}>
           <h2 style={{ marginBottom: '0.75rem' }}>Nächste Schritte</h2>
