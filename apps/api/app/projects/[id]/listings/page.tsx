@@ -184,13 +184,12 @@ export default function ListingsPage() {
             Prüfe erzeugte Entwürfe, gib passende Listings frei und exportiere sie als JSON für
             den manuellen Upload.
           </p>
-          <div style={{ marginTop: '1rem' }}>
-            <a
-              href={`/api/projects/${projectId}/export?format=json`}
-              download
-              style={exportLinkStyle}
-            >
+          <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <a href={`/api/projects/${projectId}/export?format=json`} download style={exportLinkStyle}>
               Als JSON exportieren
+            </a>
+            <a href={`/api/projects/${projectId}/export?format=csv`} download style={exportLinkStyle}>
+              Als CSV exportieren
             </a>
           </div>
         </header>
