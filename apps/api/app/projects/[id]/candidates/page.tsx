@@ -18,6 +18,10 @@ export default function CandidatesPage() {
   const [candidates, setCandidates] = useState<Candidate[]>([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editName, setEditName] = useState('')
+  const [editCategory, setEditCategory] = useState('')
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -62,24 +66,71 @@ export default function CandidatesPage() {
     })
 
     if (!response.ok) {
-      let message = 'Candidate konnte nicht verarbeitet werden.'
-
-      try {
-        const data = (await response.json()) as { error?: string }
-        if (typeof data.error === 'string') {
-          message = data.error
-        }
-      } catch {
-        // Keep fallback message if server response is not JSON.
-      }
-
-      setError(message)
+      setError(await readError(response, 'Candidate konnte nicht verarbeitet werden.'))
       setProcessing(null)
       return
     }
 
     setCandidates((current) => current.filter((candidate) => candidate.id !== candidateId))
     setProcessing(null)
+  }
+
+  function startEdit(candidate: Candidate) {
+    setEditingId(candidate.id)
+    setEditName(candidate.normalizedName)
+    setEditCategory(candidate.category)
+    setError(null)
+  }
+
+  function cancelEdit() {
+    setEditingId(null)
+    setEditName('')
+    setEditCategory('')
+    setSaving(false)
+  }
+
+  async function handleSaveEdit(candidateId: string) {
+    const normalizedName = editName.trim()
+    const category = editCategory.trim()
+
+    if (!normalizedName || !category) {
+      setError('Name und Kategorie dürfen nicht leer sein.')
+      return
+    }
+
+    setSaving(true)
+    setError(null)
+
+    const response = await fetch(`/api/projects/${projectId}/candidates/${candidateId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ normalizedName, category }),
+    })
+
+    if (!response.ok) {
+      setError(await readError(response, 'Candidate konnte nicht gespeichert werden.'))
+      setSaving(false)
+      return
+    }
+
+    const data = (await response.json()) as {
+      candidateId: string
+      normalizedName: string
+      category: string
+    }
+
+    setCandidates((current) =>
+      current.map((candidate) =>
+        candidate.id === candidateId
+          ? {
+              ...candidate,
+              normalizedName: data.normalizedName,
+              category: data.category,
+            }
+          : candidate,
+      ),
+    )
+    cancelEdit()
   }
 
   return (
@@ -168,11 +219,67 @@ export default function CandidatesPage() {
                     Kategorie: <strong>{candidate.category}</strong>
                   </p>
 
+                  {editingId === candidate.id ? (
+                    <div style={{ display: 'grid', gap: '0.75rem' }}>
+                      <label style={{ display: 'grid', gap: '0.35rem' }}>
+                        <span style={{ fontWeight: 700 }}>Name</span>
+                        <input
+                          type="text"
+                          value={editName}
+                          onChange={(event) => setEditName(event.currentTarget.value)}
+                          disabled={saving}
+                          style={inputStyle}
+                        />
+                      </label>
+
+                      <label style={{ display: 'grid', gap: '0.35rem' }}>
+                        <span style={{ fontWeight: 700 }}>Kategorie</span>
+                        <input
+                          type="text"
+                          value={editCategory}
+                          onChange={(event) => setEditCategory(event.currentTarget.value)}
+                          disabled={saving}
+                          style={inputStyle}
+                        />
+                      </label>
+
+                      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                        <button
+                          type="button"
+                          onClick={() => void handleSaveEdit(candidate.id)}
+                          disabled={saving}
+                          style={{
+                            ...buttonStyle,
+                            background: saving ? '#8d8476' : '#245c9a',
+                            color: '#ffffff',
+                            border: 0,
+                            cursor: saving ? 'progress' : 'pointer',
+                          }}
+                        >
+                          {saving ? 'Wird gespeichert...' : 'Speichern'}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={cancelEdit}
+                          disabled={saving}
+                          style={{
+                            ...secondaryButtonStyle,
+                            opacity: saving ? 0.7 : 1,
+                            cursor: saving ? 'not-allowed' : 'pointer',
+                          }}
+                        >
+                          Abbrechen
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+
                   <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                     <button
                       type="button"
                       onClick={() => handleAction(candidate.id, 'accept')}
-                      disabled={processing === candidate.id}
+                      disabled={processing === candidate.id || saving}
                       style={{
                         ...buttonStyle,
                         background: processing === candidate.id ? '#8d8476' : '#1f6f5f',
@@ -187,7 +294,7 @@ export default function CandidatesPage() {
                     <button
                       type="button"
                       onClick={() => handleAction(candidate.id, 'reject')}
-                      disabled={processing === candidate.id}
+                      disabled={processing === candidate.id || saving}
                       style={{
                         ...buttonStyle,
                         background: '#fff4f2',
@@ -199,6 +306,35 @@ export default function CandidatesPage() {
                     >
                       Ablehnen
                     </button>
+
+                    {editingId === candidate.id ? null : (
+                      <button
+                        type="button"
+                        onClick={() => startEdit(candidate)}
+                        disabled={
+                          saving ||
+                          processing !== null ||
+                          (editingId !== null && editingId !== candidate.id)
+                        }
+                        style={{
+                          ...textButtonStyle,
+                          opacity:
+                            saving ||
+                            processing !== null ||
+                            (editingId !== null && editingId !== candidate.id)
+                              ? 0.6
+                              : 1,
+                          cursor:
+                            saving ||
+                            processing !== null ||
+                            (editingId !== null && editingId !== candidate.id)
+                              ? 'not-allowed'
+                              : 'pointer',
+                        }}
+                      >
+                        Bearbeiten
+                      </button>
+                    )}
                   </div>
                 </div>
               </li>
@@ -208,6 +344,19 @@ export default function CandidatesPage() {
       </section>
     </main>
   )
+}
+
+async function readError(response: Response, fallback: string) {
+  try {
+    const data = (await response.json()) as { error?: string }
+    if (typeof data.error === 'string') {
+      return data.error
+    }
+  } catch {
+    // Keep fallback message if server response is not JSON.
+  }
+
+  return fallback
 }
 
 const backLinkStyle = {
@@ -257,6 +406,31 @@ const buttonStyle = {
   padding: '0.8rem 1rem',
   borderRadius: '999px',
   fontWeight: 700,
+} satisfies React.CSSProperties
+
+const secondaryButtonStyle = {
+  ...buttonStyle,
+  background: '#efe6d6',
+  color: '#4e463b',
+  border: 0,
+} satisfies React.CSSProperties
+
+const textButtonStyle = {
+  padding: 0,
+  border: 0,
+  background: 'transparent',
+  color: '#245c9a',
+  fontWeight: 700,
+} satisfies React.CSSProperties
+
+const inputStyle = {
+  width: '100%',
+  padding: '0.8rem 0.9rem',
+  borderRadius: '0.85rem',
+  border: '1px solid #d8d0c2',
+  background: '#ffffff',
+  color: '#2d2a24',
+  font: 'inherit',
 } satisfies React.CSSProperties
 
 const primaryLinkStyle = {

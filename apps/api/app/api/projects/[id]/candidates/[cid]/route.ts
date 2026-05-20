@@ -5,9 +5,19 @@ import { auth } from '@/auth'
 
 type RouteContext = { params: Promise<{ id: string; cid: string }> }
 
-const ActionSchema = z.object({
-  action: z.enum(['accept', 'reject']),
-})
+const PatchSchema = z.union([
+  z.object({
+    action: z.enum(['accept', 'reject']),
+  }),
+  z
+    .object({
+      normalizedName: z.string().min(1).optional(),
+      category: z.string().min(1).optional(),
+    })
+    .refine((obj) => obj.normalizedName !== undefined || obj.category !== undefined, {
+      message: 'Mindestens ein Feld muss angegeben werden.',
+    }),
+])
 
 function extractBrand(attributesJson: unknown): string | null {
   if (typeof attributesJson === 'object' && attributesJson !== null) {
@@ -42,12 +52,12 @@ export async function PATCH(request: Request, context: RouteContext) {
   try {
     body = await request.json()
   } catch {
-    return Response.json({ error: 'Invalid action' }, { status: 400 })
+    return Response.json({ error: 'Ungültige Anfrage' }, { status: 400 })
   }
 
-  const parsed = ActionSchema.safeParse(body)
+  const parsed = PatchSchema.safeParse(body)
   if (!parsed.success) {
-    return Response.json({ error: 'Invalid action' }, { status: 400 })
+    return Response.json({ error: 'Ungültige Anfrage' }, { status: 400 })
   }
 
   const candidate = await prisma.itemCandidate.findFirst({
@@ -71,6 +81,29 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   if (candidate.status !== 'pending') {
     return Response.json({ error: 'Candidate already processed' }, { status: 409 })
+  }
+
+  if (!('action' in parsed.data)) {
+    const updatedCandidate = await prisma.itemCandidate.update({
+      where: { id: candidate.id },
+      data: {
+        ...(parsed.data.normalizedName !== undefined
+          ? { normalizedName: parsed.data.normalizedName }
+          : {}),
+        ...(parsed.data.category !== undefined ? { category: parsed.data.category } : {}),
+      },
+      select: {
+        id: true,
+        normalizedName: true,
+        category: true,
+      },
+    })
+
+    return Response.json({
+      candidateId: updatedCandidate.id,
+      normalizedName: updatedCandidate.normalizedName,
+      category: updatedCandidate.category,
+    })
   }
 
   if (parsed.data.action === 'reject') {
