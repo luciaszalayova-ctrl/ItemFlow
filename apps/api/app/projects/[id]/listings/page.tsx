@@ -184,6 +184,15 @@ export default function ListingsPage() {
             Prüfe erzeugte Entwürfe, gib passende Listings frei und exportiere sie als JSON für
             den manuellen Upload.
           </p>
+          <div style={{ marginTop: '1rem' }}>
+            <a
+              href={`/api/projects/${projectId}/export?format=json`}
+              download
+              style={exportLinkStyle}
+            >
+              Als JSON exportieren
+            </a>
+          </div>
         </header>
 
         {error ? (
@@ -487,4 +496,17 @@ const textLinkStyle = {
   color: '#245c9a',
   textDecoration: 'none',
   fontWeight: 700,
+} satisfies React.CSSProperties
+
+const exportLinkStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0.75rem 1rem',
+  borderRadius: '999px',
+  background: '#efe6d6',
+  color: '#2d2a24',
+  textDecoration: 'none',
+  fontWeight: 700,
+  fontSize: '0.95rem',
 } satisfies React.CSSProperties
