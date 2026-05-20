@@ -6,12 +6,13 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
-    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "typecheck": "tsc --build tsconfig.json",
     "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
     "test": "node -e \"console.log('No tests yet for @itemflow/api')\""
   },
   "dependencies": {
     "@itemflow/db": "workspace:*",
+    "@itemflow/scoring": "workspace:*",
     "@itemflow/shared": "workspace:*",
     "@itemflow/testing": "workspace:*",
     "@itemflow/vision": "workspace:*",
