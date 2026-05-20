@@ -41,6 +41,7 @@ export default function ListingsPage() {
   const [exporting, setExporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [exportResult, setExportResult] = useState<ExportResult | null>(null)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
 
   useEffect(() => {
     let ignore = false
@@ -123,6 +124,40 @@ export default function ListingsPage() {
     setExporting(false)
   }
 
+  async function handleCopyAll() {
+    await navigator.clipboard.writeText(JSON.stringify(exportResult?.exported, null, 2))
+  }
+
+  function handleDownload() {
+    if (!exportResult) return
+
+    const json = JSON.stringify(exportResult.exported, null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+
+    link.href = url
+    link.download = 'listings-export.json'
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  async function handleCopyListing(listing: ExportedListing) {
+    const text = [
+      listing.title,
+      '',
+      listing.description,
+      '',
+      `Preis: ${(listing.priceCents / 100).toFixed(2)} €`,
+    ].join('\n')
+
+    await navigator.clipboard.writeText(text)
+    setCopiedId(listing.id)
+    setTimeout(() => {
+      setCopiedId((current) => (current === listing.id ? null : current))
+    }, 2000)
+  }
+
   return (
     <main
       style={{
@@ -190,18 +225,25 @@ export default function ListingsPage() {
 
         {exportResult ? (
           <section style={exportCardStyle}>
-            <h2 style={{ marginTop: 0 }}>{exportResult.count} Listings exportiert</h2>
-            <pre
+            <div
               style={{
-                margin: 0,
-                overflowX: 'auto',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-                fontSize: '0.9rem',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '0.75rem',
               }}
             >
-              {JSON.stringify(exportResult.exported, null, 2)}
-            </pre>
+              <h2 style={{ margin: 0 }}>{exportResult.count} Listings exportiert</h2>
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <button type="button" onClick={() => void handleCopyAll()} style={secondaryButtonStyle}>
+                  Alle kopieren
+                </button>
+                <button type="button" onClick={handleDownload} style={secondaryButtonStyle}>
+                  Als JSON herunterladen
+                </button>
+              </div>
+            </div>
           </section>
         ) : null}
 
@@ -296,7 +338,29 @@ export default function ListingsPage() {
                     ) : null}
 
                     {listing.status === 'exported' ? (
-                      <p style={{ margin: 0, color: '#245c9a', fontWeight: 700 }}>✓ Exportiert</p>
+                      <div style={{ display: 'grid', gap: '0.75rem' }}>
+                        <p style={{ margin: 0, color: '#245c9a', fontWeight: 700 }}>
+                          ✓ Exportiert
+                        </p>
+                        {exportResult ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const exported = exportResult.exported.find((entry) => entry.id === listing.id)
+                              if (exported) void handleCopyListing(exported)
+                            }}
+                            style={{
+                              ...buttonStyle,
+                              background: copiedId === listing.id ? '#1f6f5f' : '#efe6d6',
+                              color: copiedId === listing.id ? '#ffffff' : '#4e463b',
+                              border: 0,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            {copiedId === listing.id ? 'Kopiert ✓' : 'Text kopieren'}
+                          </button>
+                        ) : null}
+                      </div>
                     ) : null}
                   </div>
                 </li>
@@ -392,6 +456,19 @@ const buttonStyle = {
   padding: '0.8rem 1rem',
   borderRadius: '999px',
   fontWeight: 700,
+} satisfies React.CSSProperties
+
+const secondaryButtonStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0.7rem 1rem',
+  borderRadius: '999px',
+  background: '#efe6d6',
+  color: '#4e463b',
+  border: 0,
+  fontWeight: 700,
+  cursor: 'pointer',
 } satisfies React.CSSProperties
 
 const primaryLinkStyle = {
