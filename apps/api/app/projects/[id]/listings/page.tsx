@@ -33,9 +33,19 @@ type ExportResult = {
   count: number
 }
 
+type ActionLogEntry = {
+  id: string
+  marketplace: string
+  actionType: string
+  status: string
+  detailsJson: { format?: string; listingCount?: number } | null
+  createdAt: string
+}
+
 export default function ListingsPage() {
   const { id: projectId } = useParams<{ id: string }>()
   const [listings, setListings] = useState<ListingDraft[]>([])
+  const [actionLog, setActionLog] = useState<ActionLogEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
@@ -50,7 +60,11 @@ export default function ListingsPage() {
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`/api/projects/${projectId}/listings`)
+      const [response, logResponse] = await Promise.all([
+        fetch(`/api/projects/${projectId}/listings`),
+        fetch(`/api/projects/${projectId}/action-log`),
+      ])
+
       if (!response.ok) {
         if (!ignore) {
           setError('Listings konnten nicht geladen werden.')
@@ -62,6 +76,10 @@ export default function ListingsPage() {
       const data = (await response.json()) as { listings?: ListingDraft[] }
       if (!ignore) {
         setListings(data.listings ?? [])
+        if (logResponse.ok) {
+          const logData = (await logResponse.json()) as { logs?: ActionLogEntry[] }
+          setActionLog(logData.logs ?? [])
+        }
         setLoading(false)
       }
     }
@@ -255,6 +273,30 @@ export default function ListingsPage() {
           </section>
         ) : null}
 
+        {actionLog.length > 0 ? (
+          <section style={actionLogStyle}>
+            <h2 style={{ fontSize: '1rem', color: '#5c5346', margin: 0 }}>Letzte Exporte</h2>
+            <ul
+              style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: '0.75rem 0 0',
+                display: 'grid',
+                gap: '0.4rem',
+              }}
+            >
+              {actionLog.map((entry) => (
+                <li key={entry.id} style={{ color: '#7b6f5b', fontSize: '0.9rem' }}>
+                  {formatAction(entry)} — {new Date(entry.createdAt).toLocaleString('de-DE')}
+                  {entry.detailsJson?.listingCount != null
+                    ? ` (${entry.detailsJson.listingCount} Listings)`
+                    : ''}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
         {loading ? (
           <section style={cardStyle}>
             <p style={{ margin: 0 }}>Listings werden geladen...</p>
@@ -405,6 +447,20 @@ function formatStatus(status: string) {
   }
 }
 
+function formatAction(entry: ActionLogEntry) {
+  const format = entry.detailsJson?.format
+
+  if (entry.actionType === 'export' && format === 'json') {
+    return 'JSON-Export'
+  }
+
+  if (entry.actionType === 'export' && format === 'csv') {
+    return 'CSV-Export'
+  }
+
+  return `${entry.actionType} (${entry.marketplace})`
+}
+
 function formatEuro(cents: number) {
   return `${(cents / 100).toFixed(2)} €`
 }
@@ -446,6 +502,14 @@ const exportCardStyle = {
   borderRadius: '1rem',
   background: '#f3f8ff',
   border: '1px solid #d6e3f5',
+} satisfies React.CSSProperties
+
+const actionLogStyle = {
+  marginTop: '1.5rem',
+  padding: '1rem',
+  borderRadius: '1rem',
+  background: '#fffaf0',
+  border: '1px solid #e5d9c4',
 } satisfies React.CSSProperties
 
 const metaPillStyle = {
