@@ -3,7 +3,7 @@
 Erstellt: 2026-05-20  
 Erstellt von: Claude Code  
 Implementiert von: **Codex**  
-Status: `draft`
+Status: `ready`
 
 ---
 
