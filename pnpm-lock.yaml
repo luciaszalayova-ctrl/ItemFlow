@@ -65,6 +65,12 @@ importers:
       '@itemflow/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@itemflow/testing':
+        specifier: workspace:*
+        version: link:../../packages/testing
+      '@itemflow/vision':
+        specifier: workspace:*
+        version: link:../../packages/vision
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3

@@ -13,6 +13,8 @@
   "dependencies": {
     "@itemflow/db": "workspace:*",
     "@itemflow/shared": "workspace:*",
+    "@itemflow/testing": "workspace:*",
+    "@itemflow/vision": "workspace:*",
     "bcryptjs": "^2.4.3",
     "next": "^14.2.33",
     "next-auth": "5.0.0-beta.31",
