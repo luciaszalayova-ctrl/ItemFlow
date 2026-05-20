@@ -199,16 +199,21 @@ export default function ListingsPage() {
           <p style={{ margin: 0, color: '#7b6f5b' }}>Listing-Workflow</p>
           <h1 style={{ marginTop: '0.5rem', marginBottom: '0.75rem' }}>Listings</h1>
           <p style={{ marginTop: 0, color: '#5c5346', lineHeight: 1.6 }}>
-            Prüfe erzeugte Entwürfe, gib passende Listings frei und exportiere sie als JSON für
-            den manuellen Upload.
+            Prüfe erzeugte Entwürfe, gib passende Listings frei und exportiere sie für den
+            manuellen Upload.
           </p>
-          <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <a href={`/api/projects/${projectId}/export?format=json`} download style={exportLinkStyle}>
-              Als JSON exportieren
-            </a>
-            <a href={`/api/projects/${projectId}/export?format=csv`} download style={exportLinkStyle}>
-              Als CSV exportieren
-            </a>
+          <div style={{ marginTop: '1rem' }}>
+            <p style={{ margin: '0 0 0.5rem', fontSize: '0.85rem', color: '#7b6f5b' }}>
+              Alle Listings herunterladen (vollständige Übersicht):
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <a href={`/api/projects/${projectId}/export?format=json`} download style={exportLinkStyle}>
+                JSON herunterladen
+              </a>
+              <a href={`/api/projects/${projectId}/export?format=csv`} download style={exportLinkStyle}>
+                CSV herunterladen
+              </a>
+            </div>
           </div>
         </header>
 
