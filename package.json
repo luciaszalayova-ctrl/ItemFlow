@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@10.0.0",
   "scripts": {
-    "dev": "pnpm --filter @itemflow/api dev",
+    "dev": "corepack pnpm --filter @itemflow/api dev",
     "build": "corepack pnpm -r build",
     "typecheck": "corepack pnpm -r typecheck",
     "lint": "corepack pnpm -r lint",
