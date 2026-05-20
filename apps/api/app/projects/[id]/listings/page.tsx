@@ -272,11 +272,27 @@ export default function ListingsPage() {
                         >
                           {isProcessing ? 'Bitte warten...' : 'Freigeben'}
                         </button>
+                        <Link
+                          href={`/projects/${projectId}/listings/${listing.id}/edit`}
+                          style={textLinkStyle}
+                        >
+                          Bearbeiten →
+                        </Link>
                       </div>
                     ) : null}
 
                     {listing.status === 'reviewed' ? (
-                      <p style={{ margin: 0, color: '#1f6f5f', fontWeight: 700 }}>✓ Freigegeben</p>
+                      <>
+                        <p style={{ margin: 0, color: '#1f6f5f', fontWeight: 700 }}>
+                          ✓ Freigegeben
+                        </p>
+                        <Link
+                          href={`/projects/${projectId}/listings/${listing.id}/edit`}
+                          style={textLinkStyle}
+                        >
+                          Bearbeiten →
+                        </Link>
+                      </>
                     ) : null}
 
                     {listing.status === 'exported' ? (
@@ -386,6 +402,12 @@ const primaryLinkStyle = {
   borderRadius: '999px',
   background: '#1f6f5f',
   color: '#ffffff',
+  textDecoration: 'none',
+  fontWeight: 700,
+} satisfies React.CSSProperties
+
+const textLinkStyle = {
+  color: '#245c9a',
   textDecoration: 'none',
   fontWeight: 700,
 } satisfies React.CSSProperties
