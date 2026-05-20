@@ -1,5 +1,5 @@
 import { prisma } from '@itemflow/db'
-import { generateListingDraft } from '@itemflow/listings'
+import { TemplateListingGenerator } from '@itemflow/listings'
 import { GeneratedListingSchema } from '@itemflow/shared'
 
 import { auth } from '@/auth'
@@ -30,8 +30,10 @@ export async function POST(_request: Request, context: RouteContext) {
       id: true,
       projectId: true,
       title: true,
+      itemIds: true,
       rationale: true,
       status: true,
+      createdAt: true,
     },
   })
 
@@ -47,11 +49,75 @@ export async function POST(_request: Request, context: RouteContext) {
     return Response.json({ error: 'Bundle ist nicht für Listing-Erstellung freigegeben.' }, { status: 409 })
   }
 
-  const raw = await generateListingDraft({
-    title: bundle.title,
-    description: bundle.rationale ?? '',
-    condition: 'Verschiedene Zustände',
-    category: 'Paket',
+  const bundleItems =
+    bundle.itemIds.length > 0
+      ? await prisma.inventoryItem.findMany({
+          where: { id: { in: bundle.itemIds }, projectId },
+          select: {
+            id: true,
+            projectId: true,
+            title: true,
+            category: true,
+            brand: true,
+            model: true,
+            condition: true,
+            quantity: true,
+            description: true,
+            defects: true,
+            completeness: true,
+            sourceCandidateIds: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        })
+      : []
+
+  const recommendations =
+    bundleItems.length > 0
+      ? await prisma.recommendation.findMany({
+          where: { targetType: 'item', targetId: { in: bundleItems.map((item) => item.id) } },
+          orderBy: { createdAt: 'desc' },
+          select: {
+            targetId: true,
+            expectedPriceCents: true,
+            minimumPriceCents: true,
+          },
+        })
+      : []
+
+  const latestByItem = new Map<
+    string,
+    { expectedPriceCents: number | null; minimumPriceCents: number | null }
+  >()
+  for (const recommendation of recommendations) {
+    if (!latestByItem.has(recommendation.targetId)) {
+      latestByItem.set(recommendation.targetId, recommendation)
+    }
+  }
+
+  const suggestedPriceCents =
+    recommendations.length > 0
+      ? [...latestByItem.values()].reduce((sum, recommendation) => {
+          return sum + (recommendation.expectedPriceCents ?? 0)
+        }, 0)
+      : undefined
+
+  const minimumPriceCents =
+    recommendations.length > 0
+      ? [...latestByItem.values()].reduce((sum, recommendation) => {
+          return sum + (recommendation.minimumPriceCents ?? 0)
+        }, 0)
+      : undefined
+
+  const generator = new TemplateListingGenerator()
+  const raw = await generator.generate({
+    targetType: 'bundle',
+    bundle,
+    bundleItems,
+    platform: 'kleinanzeigen',
+    suggestedPriceCents: suggestedPriceCents ?? undefined,
+    minimumPriceCents: minimumPriceCents ?? undefined,
   })
   const generated = GeneratedListingSchema.parse(raw)
 
