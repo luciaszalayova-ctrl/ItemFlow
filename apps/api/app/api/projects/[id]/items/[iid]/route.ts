@@ -71,9 +71,7 @@ export async function GET(
   return Response.json({
     item: {
       ...item,
-      scoringRecommendation: latestRecommendation
-        ? mapRecommendationAction(latestRecommendation.action)
-        : null,
+      scoringRecommendation: latestRecommendation?.action ?? null,
     },
   })
 }
@@ -160,26 +158,7 @@ export async function PATCH(
   return Response.json({
     item: {
       ...updated,
-      scoringRecommendation: latestRecommendation
-        ? mapRecommendationAction(latestRecommendation.action)
-        : null,
+      scoringRecommendation: latestRecommendation?.action ?? null,
     },
   })
-}
-
-function mapRecommendationAction(action: string): string {
-  switch (action) {
-    case 'sell_individually':
-      return 'sell_single'
-    case 'bundle':
-      return 'bundle'
-    case 'donate':
-      return 'donate'
-    case 'give_away':
-      return 'gift'
-    case 'recycle_dispose':
-      return 'recycle'
-    default:
-      return action
-  }
 }

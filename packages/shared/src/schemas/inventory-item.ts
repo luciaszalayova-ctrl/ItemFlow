@@ -22,7 +22,7 @@ export const InventoryItemSchema = z.object({
   defects: z.string().nullable(),
   completeness: z.string().nullable(),
   scoringOverride: z
-    .enum(['sell_single', 'bundle', 'donate', 'gift', 'recycle'])
+    .enum(['sell_individually', 'bundle', 'give_away', 'donate', 'recycle_dispose'])
     .nullable()
     .optional(),
   sourceCandidateIds: z.array(z.string()),
@@ -43,7 +43,7 @@ export const UpdateInventoryItemSchema = z.object({
   defects: z.string().nullable().optional(),
   completeness: z.string().nullable().optional(),
   scoringOverride: z
-    .enum(['sell_single', 'bundle', 'donate', 'gift', 'recycle'])
+    .enum(['sell_individually', 'bundle', 'give_away', 'donate', 'recycle_dispose'])
     .nullable()
     .optional(),
 })

@@ -275,11 +275,11 @@ export default function EditItemPage() {
                     style={inputStyle}
                   >
                     <option value="">— Engine-Empfehlung übernehmen —</option>
-                    <option value="sell_single">Einzeln verkaufen</option>
+                    <option value="sell_individually">Einzeln verkaufen</option>
                     <option value="bundle">Bündeln</option>
                     <option value="donate">Spenden</option>
-                    <option value="gift">Verschenken</option>
-                    <option value="recycle">Recyceln / Entsorgen</option>
+                    <option value="give_away">Verschenken</option>
+                    <option value="recycle_dispose">Recyceln / Entsorgen</option>
                   </select>
                 </div>
               ) : null}
@@ -345,11 +345,12 @@ async function readError(response: Response, fallback: string) {
 
 function labelFor(recommendation: string): string {
   const labels: Record<string, string> = {
-    sell_single: 'Einzeln verkaufen',
+    sell_individually: 'Einzeln verkaufen',
     bundle: 'Bündeln',
     donate: 'Spenden',
-    gift: 'Verschenken',
-    recycle: 'Recyceln / Entsorgen',
+    give_away: 'Verschenken',
+    recycle_dispose: 'Recyceln / Entsorgen',
+    needs_review: 'Prüfen',
   }
 
   return labels[recommendation] ?? recommendation
