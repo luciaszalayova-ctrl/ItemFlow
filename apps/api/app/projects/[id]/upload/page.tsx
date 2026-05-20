@@ -2,10 +2,16 @@
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 
 type UploadResult = {
   candidateCount: number
+}
+
+type AssetEntry = {
+  id: string
+  fileName: string
+  sizeBytes: number
 }
 
 export default function UploadPage() {
@@ -13,6 +19,27 @@ export default function UploadPage() {
   const [uploading, setUploading] = useState(false)
   const [result, setResult] = useState<UploadResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [assets, setAssets] = useState<AssetEntry[]>([])
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  useEffect(() => {
+    let ignore = false
+
+    async function loadAssets() {
+      const response = await fetch(`/api/projects/${projectId}/assets`)
+      if (!response.ok || ignore) return
+
+      const data = (await response.json()) as { assets?: AssetEntry[] }
+      if (!ignore) {
+        setAssets(data.assets ?? [])
+      }
+    }
+
+    void loadAssets()
+    return () => {
+      ignore = true
+    }
+  }, [projectId])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -54,12 +81,42 @@ export default function UploadPage() {
       return
     }
 
-    const data = (await response.json()) as { candidateCount?: number; candidates?: unknown[] }
+    const data = (await response.json()) as {
+      candidateCount?: number
+      candidates?: unknown[]
+      asset?: AssetEntry
+    }
     setResult({
       candidateCount: data.candidateCount ?? data.candidates?.length ?? 0,
     })
+    const uploadedAsset = data.asset
+    if (uploadedAsset) {
+      setAssets((current) => [...current, uploadedAsset])
+    }
     setUploading(false)
     form.reset()
+  }
+
+  async function handleDeleteAsset(assetId: string, fileName: string) {
+    if (!confirm(`"${fileName}" wirklich loeschen?`)) {
+      return
+    }
+
+    setDeletingId(assetId)
+    setError(null)
+
+    const response = await fetch(`/api/projects/${projectId}/assets/${assetId}`, {
+      method: 'DELETE',
+    })
+
+    if (!response.ok) {
+      setError('Foto konnte nicht geloescht werden.')
+      setDeletingId(null)
+      return
+    }
+
+    setAssets((current) => current.filter((asset) => asset.id !== assetId))
+    setDeletingId(null)
   }
 
   return (
@@ -147,10 +204,48 @@ export default function UploadPage() {
               </Link>
             </section>
           ) : null}
+
+          {assets.length > 0 ? (
+            <section style={{ marginTop: '2rem' }}>
+              <h2 style={{ marginBottom: '0.75rem', fontSize: '1.1rem' }}>
+                Hochgeladene Fotos ({assets.length})
+              </h2>
+              <ul style={assetListStyle}>
+                {assets.map((asset) => (
+                  <li key={asset.id} style={assetItemStyle}>
+                    <span style={{ color: '#5c5346' }}>
+                      {asset.fileName}
+                      <span style={{ color: '#9b8f7b', marginLeft: '0.5rem' }}>
+                        ({formatBytes(asset.sizeBytes)})
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => void handleDeleteAsset(asset.id, asset.fileName)}
+                      disabled={deletingId === asset.id}
+                      style={{
+                        ...deleteButtonStyle,
+                        cursor: deletingId === asset.id ? 'progress' : 'pointer',
+                        opacity: deletingId === asset.id ? 0.7 : 1,
+                      }}
+                    >
+                      {deletingId === asset.id ? '...' : 'Loeschen'}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
         </section>
       </section>
     </main>
   )
+}
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 const backLinkStyle = {
@@ -184,6 +279,34 @@ const successCardStyle = {
   borderRadius: '0.9rem',
   background: '#eef8f3',
   border: '1px solid #cde6d8',
+} satisfies React.CSSProperties
+
+const assetListStyle = {
+  listStyle: 'none',
+  margin: 0,
+  padding: 0,
+  display: 'grid',
+  gap: '0.75rem',
+} satisfies React.CSSProperties
+
+const assetItemStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: '1rem',
+  padding: '0.9rem 1rem',
+  borderRadius: '0.85rem',
+  border: '1px solid #e4dccf',
+  background: '#faf7f1',
+} satisfies React.CSSProperties
+
+const deleteButtonStyle = {
+  border: '1px solid #d6cbbb',
+  borderRadius: '999px',
+  padding: '0.6rem 0.9rem',
+  background: '#fff4f2',
+  color: '#9a2f1f',
+  fontWeight: 700,
 } satisfies React.CSSProperties
 
 const primaryLinkStyle = {
