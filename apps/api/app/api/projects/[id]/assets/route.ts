@@ -10,6 +10,35 @@ import { auth } from "@/auth";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
+export async function GET(_request: Request, context: RouteContext): Promise<NextResponse> {
+  const session = await auth();
+  if (!session?.user?.userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id: projectId } = await context.params;
+
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { id: true, userId: true, status: true },
+  });
+  if (!project || project.status === "deleted") {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  if (project.userId !== session.user.userId) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const assets = await prisma.asset.findMany({
+    where: { projectId },
+    orderBy: { createdAt: "asc" },
+    select: { id: true, fileName: true, sizeBytes: true, createdAt: true },
+  });
+
+  return NextResponse.json({ assets });
+}
+
 export async function POST(request: NextRequest, context: RouteContext): Promise<NextResponse> {
   const session = await auth();
   if (!session?.user?.userId) {
@@ -104,6 +133,12 @@ export async function POST(request: NextRequest, context: RouteContext): Promise
 
   return NextResponse.json({
     assetId: asset.id,
+    asset: {
+      id: asset.id,
+      fileName: asset.fileName,
+      sizeBytes: asset.sizeBytes,
+      createdAt: asset.createdAt,
+    },
     candidateCount: createdCandidates.length,
     candidates: createdCandidates.map((c) => {
       const raw = c.rawModelOutputJson as {
