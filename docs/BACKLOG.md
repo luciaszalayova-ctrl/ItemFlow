@@ -1,6 +1,6 @@
 # ItemFlow-Backlog
 
-Letztes Update: 2026-05-19  
+Letztes Update: 2026-05-20  
 Status: Initiale Version - wartet auf Phase-0-Validierung
 
 ---
@@ -111,6 +111,8 @@ Explizit **nicht** im MVP:
   - Akzeptanz: Strukturierte Kandidaten mit Name, Kategorie, Konfidenz und Quellfoto.
 - **US-502** Als Nutzer erkenne ich visuell, welche Erkennungen unsicher sind, damit ich diese besonders pruefe.
   - Akzeptanz: Kandidaten mit `confidence < 0.6` sind visuell markiert.
+- **US-503** Als Nutzer kann ich Fotos in ChatGPT hochladen und das Ergebnis-JSON in ItemFlow importieren, wenn kein automatischer Vision-Provider verfuegbar ist.
+  - Akzeptanz: Import-UI mit Textarea und Vorschau. Valides JSON erzeugt `ItemCandidate`-Eintraege. Ungueltiges JSON zeigt verstaendliche Fehlermeldung. Importierte Kandidaten erscheinen im normalen Review-Flow.
 
 ### E6 - Review und Inventar
 
@@ -208,6 +210,8 @@ Explizit **nicht** im MVP:
 | T-503 | `MockVisionProvider` mit realistischen Fixtures (5-8 Gegenstandstypen) | P1 | Claude Code |
 | T-504 | `POST /api/projects/:id/analyze` - Analyse-Job mit Mock-Provider | P1 | Codex |
 | T-505 | `GET /api/projects/:id/candidates` - Kandidaten abrufen | P1 | Codex |
+| T-506 | `POST /api/projects/:id/candidates/import` - ChatGPT-JSON importieren (validiert per `VisionCandidateRawSchema`) | P1 | Codex |
+| T-507 | Import-UI: Textarea + JSON-Vorschau + Bestaetigung in `app/projects/[id]/import/page.tsx` | P1 | Codex |
 
 ### E6 - Review und Inventar
 
@@ -314,7 +318,7 @@ Jede Feature-Aufgabe gilt als fertig, wenn:
 | Prioritaet | Beschreibung | Task-IDs |
 |------------|--------------|----------|
 | **P0** | Blocker - ohne diese startet nichts | T-101, T-102, T-201, T-202, T-203, T-204, T-401, T-501, T-502, T-701 (Interface), T-901, T-902 |
-| **P1** | MVP-Kern - minimaler Ende-zu-Ende-Flow ist beweisbar | T-103, T-301..304, T-402..407, T-503..505, T-601..606, T-702..706, T-903..909, T-1001..1003, T-1101..1111, T-1201..1203 |
+| **P1** | MVP-Kern - minimaler Ende-zu-Ende-Flow ist beweisbar | T-103, T-301..304, T-402..407, T-503..507, T-601..606, T-702..706, T-903..909, T-1001..1003, T-1101..1111, T-1201..1203 |
 | **P2** | MVP-Erweiterung - nuetzlich, aber nicht blockierend | T-408, T-801..804, T-906, T-910, T-1004, T-1112 |
 | **P3** | Nach dem MVP | T-911, echter Vision-Provider (Phase 2), Playwright-Vorausfuellen (Phase 5), eBay-API (Phase 6) |
 
@@ -350,7 +354,7 @@ Codex uebernimmt:
 - Export-Endpunkte
 - E2E-Tests (Playwright, T-1112)
 
-**Konkrete P0/P1-Aufgaben:** T-101, T-102, T-202, T-203, T-204, T-301..304, T-402..407, T-504, T-505, T-601..606, T-705, T-905..908, T-1001..1003, T-1201..1203
+**Konkrete P0/P1-Aufgaben:** T-101, T-102, T-202, T-203, T-204, T-301..304, T-402..407, T-504..507, T-601..606, T-705, T-905..908, T-1001..1003, T-1201..1203
 
 ---
 

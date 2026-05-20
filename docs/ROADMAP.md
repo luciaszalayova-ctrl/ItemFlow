@@ -37,6 +37,27 @@ Funktionen:
 - Listing-Generator.
 - Listings exportieren/kopieren.
 
+## Phase 1.5: Hybrider ChatGPT-Import
+
+Ziel:
+
+Den Mock-Provider ueberbruecken, ohne einen kostenpflichtigen KI-Anbieter einzubinden.
+Nutzer koennen Fotos in ChatGPT hochladen, das Ergebnis-JSON in ItemFlow einfuegen
+und danach den normalen Review-Flow nutzen.
+
+Funktionen:
+
+- Copy-Paste-Prompt fuer ChatGPT (in PROMPTS.md dokumentiert).
+- Import-Endpunkt: `POST /api/projects/:id/candidates/import`.
+- Validierung per `VisionCandidateRawSchema` (Zod, bereits vorhanden).
+- Import-UI: Textarea, Vorschau, Bestaetigung.
+- Ergebnis: `ItemCandidate`-Eintraege — identisch zur automatischen Erkennung.
+
+Voraussetzung fuer Phase 2:
+
+- Phase 1.5 ist optional; Phase 2 (echter Vision-Provider) ersetzt sie vollstaendig.
+- Beide Pfade erzeugen dieselben `ItemCandidate`-Eintraege — der Rest des Flows ist unveraendert.
+
 ## Phase 2: KI-Bildanalyse integrieren
 
 Ziel:

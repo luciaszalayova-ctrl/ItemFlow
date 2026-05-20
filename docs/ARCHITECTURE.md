@@ -101,10 +101,12 @@ Die Anwendung sollte nicht im gesamten Code direkt von einem einzelnen Modellanb
 
 ## Datenfluss
 
+Automatischer Pfad (VisionProvider):
+
 ```text
 Fotos hochladen
 -> Asset-Eintraege anlegen
--> Assets analysieren
+-> Assets analysieren (VisionProvider)
 -> ItemCandidate-Eintraege anlegen
 -> Nutzer prueft Kandidaten
 -> InventoryItem-Eintraege anlegen
@@ -113,6 +115,20 @@ Fotos hochladen
 -> ListingDraft-Eintraege erzeugen
 -> exportieren oder Marketplace-Formulare vorausfuellen
 ```
+
+Manueller Pfad (ChatGPT-Import, Phase 1.5):
+
+```text
+Nutzer laedt Fotos manuell in ChatGPT hoch
+-> Nutzer fuegt JSON-Antwort in ItemFlow ein
+-> POST /api/projects/:id/candidates/import
+-> Validierung per VisionCandidateRawSchema
+-> ItemCandidate-Eintraege anlegen
+-> (weiter wie automatischer Pfad ab "Nutzer prueft Kandidaten")
+```
+
+Beide Pfade erzeugen identische `ItemCandidate`-Eintraege.
+Ab der Kandidaten-Review ist der Flow in beiden Faellen gleich.
 
 ## Strategie fuer Marketplace-Integrationen
 

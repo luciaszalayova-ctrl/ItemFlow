@@ -1,5 +1,45 @@
 # Prompt-Bibliothek
 
+## Manueller ChatGPT-Workflow — Prompt fuer Nutzer
+
+Dieser Prompt ist fuer Nutzer gedacht, die Fotos direkt in ChatGPT hochladen und das Ergebnis per Copy-Paste in ItemFlow importieren.
+
+```text
+Analysiere das/die Bild(er) und erkenne alle verkaeuflichen Haushaltgegenstaende.
+Antworte NUR mit einem JSON-Array — kein Markdown, kein Fliesstext, keine Erklaerungen.
+
+Format:
+[
+  {
+    "rawLabel": "Bosch-Akkuschrauber blau",
+    "normalizedName": "Akkuschrauber",
+    "category": "Werkzeug",
+    "confidence": 0.92
+  }
+]
+
+Regeln:
+- Nur verkaeufliche Gegenstaende (keine Waende, Boeden, fest eingebaute Moebel)
+- Maximal 15 Eintraege pro Bild
+- confidence 0.9+ nur wenn Gegenstand eindeutig erkennbar
+- confidence 0.5-0.7 wenn unsicher (Marke unklar, Zustand unbekannt)
+- rawLabel: genau das was du siehst (z. B. "blauer Koffer mit Raedern")
+- normalizedName: normalisierter Gattungsname (z. B. "Koffer")
+- category: eine von: Elektronik, Spielzeug, Kleidung, Buecher, Haushalt, Werkzeug, Sport, Moebel, Sonstiges
+```
+
+Optionale Felder (ChatGPT kann, muss aber nicht liefern):
+
+```text
+- "uncertaintyNotes": "Marke nicht lesbar"
+- "bundlePotential": true
+- "attributes": { "brand": "Bosch", "color": "blau" }
+```
+
+Diese Felder werden von ItemFlow akzeptiert, falls vorhanden, und haben sonst Standardwerte.
+
+---
+
 ## Prompt fuer Vision-Analyse
 
 ```text

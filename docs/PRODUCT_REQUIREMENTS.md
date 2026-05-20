@@ -35,6 +35,18 @@ Akzeptanzkriterien:
 - Der Nutzer kann erkannte Gegenstaende bearbeiten, zusammenfuehren, aufteilen oder loeschen.
 - Erkennungen mit niedriger Confidence sind klar markiert.
 
+### Gegenstaende manuell per ChatGPT importieren
+
+Als Nutzer moechte ich ChatGPT als kostenfreie Alternative zur automatischen Bilderkennung nutzen, indem ich Fotos dort hochlade und das Ergebnis-JSON in ItemFlow einfuege.
+
+Akzeptanzkriterien:
+
+- Der Nutzer kann einen vorbereiteten Prompt kopieren und mit eigenen Fotos in ChatGPT nutzen.
+- Das System stellt ein Eingabefeld bereit, in das der Nutzer die JSON-Antwort von ChatGPT einfuegen kann.
+- Das System validiert das eingefuegte JSON und zeigt verstaendliche Fehlermeldungen bei ungueltiger Struktur.
+- Nach Bestaetigung werden Gegenstandskandidaten angelegt — identisch zu den Kandidaten aus der automatischen Erkennung.
+- Der Nutzer prueft und bearbeitet die importierten Kandidaten im normalen Review-Flow weiter.
+
 ### Inventar pruefen
 
 Als Nutzer moechte ich die Gegenstandsliste korrigieren, bevor Empfehlungen erzeugt werden.
