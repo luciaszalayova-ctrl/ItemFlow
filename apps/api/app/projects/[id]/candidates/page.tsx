@@ -23,6 +23,8 @@ export default function CandidatesPage() {
   const [editCategory, setEditCategory] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkProcessing, setBulkProcessing] = useState(false)
 
   useEffect(() => {
     let ignore = false
@@ -54,6 +56,48 @@ export default function CandidatesPage() {
       ignore = true
     }
   }, [projectId])
+
+  const allSelected =
+    candidates.length > 0 && candidates.every((c) => selectedIds.has(c.id))
+
+  function toggleSelect(id: string) {
+    setSelectedIds((current) => {
+      const next = new Set(current)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(candidates.map((c) => c.id)))
+    }
+  }
+
+  async function handleBulkAction(action: 'accept' | 'reject') {
+    if (selectedIds.size === 0) return
+    setBulkProcessing(true)
+    setError(null)
+
+    const response = await fetch(`/api/projects/${projectId}/candidates/bulk`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: Array.from(selectedIds), action }),
+    })
+
+    if (!response.ok) {
+      setError(await readError(response, 'Bulk-Aktion konnte nicht ausgeführt werden.'))
+      setBulkProcessing(false)
+      return
+    }
+
+    setCandidates((current) => current.filter((c) => !selectedIds.has(c.id)))
+    setSelectedIds(new Set())
+    setBulkProcessing(false)
+  }
 
   async function handleAction(candidateId: string, action: 'accept' | 'reject') {
     setProcessing(candidateId)
@@ -192,6 +236,70 @@ export default function CandidatesPage() {
             </Link>
           </section>
         ) : (
+          <>
+            <div
+              style={{
+                marginTop: '1.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                flexWrap: 'wrap',
+              }}
+            >
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 700 }}>
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={toggleSelectAll}
+                  disabled={bulkProcessing || processing !== null}
+                />
+                {allSelected ? 'Auswahl aufheben' : 'Alle auswählen'}
+              </label>
+            </div>
+
+            {selectedIds.size > 0 ? (
+              <div style={actionBarStyle}>
+                <span style={{ fontWeight: 700 }}>{selectedIds.size} ausgewählt</span>
+                <button
+                  type="button"
+                  onClick={() => void handleBulkAction('accept')}
+                  disabled={bulkProcessing}
+                  style={{
+                    ...buttonStyle,
+                    background: bulkProcessing ? '#8d8476' : '#1f6f5f',
+                    color: '#ffffff',
+                    border: 0,
+                    cursor: bulkProcessing ? 'progress' : 'pointer',
+                  }}
+                >
+                  {bulkProcessing ? 'Bitte warten...' : 'Auswahl akzeptieren'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleBulkAction('reject')}
+                  disabled={bulkProcessing}
+                  style={{
+                    ...buttonStyle,
+                    background: '#fff4f2',
+                    color: '#9a2f1f',
+                    border: '1px solid #efc6c0',
+                    cursor: bulkProcessing ? 'progress' : 'pointer',
+                    opacity: bulkProcessing ? 0.7 : 1,
+                  }}
+                >
+                  Auswahl ablehnen
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedIds(new Set())}
+                  disabled={bulkProcessing}
+                  style={{ ...secondaryButtonStyle, cursor: bulkProcessing ? 'not-allowed' : 'pointer' }}
+                >
+                  Auswahl aufheben
+                </button>
+              </div>
+            ) : null}
+
           <ul style={listStyle}>
             {candidates.map((candidate) => (
               <li key={candidate.id} style={cardStyle}>
@@ -204,11 +312,20 @@ export default function CandidatesPage() {
                       flexWrap: 'wrap',
                     }}
                   >
-                    <div>
-                      <h2 style={{ margin: 0, fontSize: '1.2rem' }}>{candidate.normalizedName}</h2>
-                      <p style={{ margin: '0.35rem 0 0', color: '#6f624e' }}>
-                        Rohlabel: {candidate.rawLabel}
-                      </p>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(candidate.id)}
+                        onChange={() => toggleSelect(candidate.id)}
+                        disabled={bulkProcessing || processing !== null}
+                        style={{ marginTop: '0.35rem', cursor: 'pointer' }}
+                      />
+                      <div>
+                        <h2 style={{ margin: 0, fontSize: '1.2rem' }}>{candidate.normalizedName}</h2>
+                        <p style={{ margin: '0.35rem 0 0', color: '#6f624e' }}>
+                          Rohlabel: {candidate.rawLabel}
+                        </p>
+                      </div>
                     </div>
                     <span
                       style={
@@ -284,13 +401,13 @@ export default function CandidatesPage() {
                     <button
                       type="button"
                       onClick={() => handleAction(candidate.id, 'accept')}
-                      disabled={processing === candidate.id || saving}
+                      disabled={processing === candidate.id || saving || bulkProcessing}
                       style={{
                         ...buttonStyle,
                         background: processing === candidate.id ? '#8d8476' : '#1f6f5f',
                         color: '#ffffff',
                         border: 0,
-                        cursor: processing === candidate.id ? 'progress' : 'pointer',
+                        cursor: processing === candidate.id || bulkProcessing ? 'progress' : 'pointer',
                       }}
                     >
                       {processing === candidate.id ? 'Bitte warten...' : 'Akzeptieren'}
@@ -299,14 +416,14 @@ export default function CandidatesPage() {
                     <button
                       type="button"
                       onClick={() => handleAction(candidate.id, 'reject')}
-                      disabled={processing === candidate.id || saving}
+                      disabled={processing === candidate.id || saving || bulkProcessing}
                       style={{
                         ...buttonStyle,
                         background: '#fff4f2',
                         color: '#9a2f1f',
                         border: '1px solid #efc6c0',
-                        cursor: processing === candidate.id ? 'progress' : 'pointer',
-                        opacity: processing === candidate.id ? 0.7 : 1,
+                        cursor: processing === candidate.id || bulkProcessing ? 'progress' : 'pointer',
+                        opacity: processing === candidate.id || bulkProcessing ? 0.7 : 1,
                       }}
                     >
                       Ablehnen
@@ -319,6 +436,7 @@ export default function CandidatesPage() {
                         disabled={
                           saving ||
                           processing !== null ||
+                          bulkProcessing ||
                           (editingId !== null && editingId !== candidate.id)
                         }
                         style={{
@@ -326,12 +444,14 @@ export default function CandidatesPage() {
                           opacity:
                             saving ||
                             processing !== null ||
+                            bulkProcessing ||
                             (editingId !== null && editingId !== candidate.id)
                               ? 0.6
                               : 1,
                           cursor:
                             saving ||
                             processing !== null ||
+                            bulkProcessing ||
                             (editingId !== null && editingId !== candidate.id)
                               ? 'not-allowed'
                               : 'pointer',
@@ -345,6 +465,7 @@ export default function CandidatesPage() {
               </li>
             ))}
           </ul>
+          </>
         )}
       </section>
     </main>
@@ -436,6 +557,18 @@ const textButtonStyle = {
   background: 'transparent',
   color: '#245c9a',
   fontWeight: 700,
+} satisfies React.CSSProperties
+
+const actionBarStyle = {
+  marginTop: '1rem',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.75rem',
+  flexWrap: 'wrap',
+  padding: '0.75rem 1rem',
+  borderRadius: '0.9rem',
+  background: '#f0ece3',
+  border: '1px solid #d8d0c2',
 } satisfies React.CSSProperties
 
 const inputStyle = {
