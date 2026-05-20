@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@itemflow/db": "workspace:*",
+    "@itemflow/listings": "workspace:*",
     "@itemflow/scoring": "workspace:*",
     "@itemflow/shared": "workspace:*",
     "@itemflow/testing": "workspace:*",

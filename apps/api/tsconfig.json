@@ -28,6 +28,7 @@
   "references": [
     { "path": "../../packages/shared" },
     { "path": "../../packages/db" },
-    { "path": "../../packages/scoring" }
+    { "path": "../../packages/scoring" },
+    { "path": "../../packages/listings" }
   ]
 }

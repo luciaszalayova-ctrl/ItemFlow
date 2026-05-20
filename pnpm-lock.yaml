@@ -62,6 +62,9 @@ importers:
       '@itemflow/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@itemflow/listings':
+        specifier: workspace:*
+        version: link:../../packages/listings
       '@itemflow/scoring':
         specifier: workspace:*
         version: link:../../packages/scoring
