@@ -62,6 +62,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       meta: 'Bilder fuer die automatische Erkennung erfassen',
     },
     {
+      href: `/projects/${id}/import`,
+      label: 'ChatGPT importieren',
+      meta: 'JSON-Analyse aus ChatGPT einfuegen und als Candidates importieren',
+    },
+    {
       href: `/projects/${id}/candidates`,
       label: `Candidates pruefen (${candidateCount} ausstehend)`,
       meta: 'Erkannte Vorschlaege bestaetigen oder ablehnen',
