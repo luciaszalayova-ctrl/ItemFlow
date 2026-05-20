@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 type Item = {
   id: string
   title: string
-  category: string
+  category: string | null
   condition: string | null
   status: string
 }
@@ -28,6 +28,10 @@ export default function ItemsPage() {
   const [processing, setProcessing] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [scores, setScores] = useState<Record<string, Recommendation>>({})
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [addTitle, setAddTitle] = useState('')
+  const [addCategory, setAddCategory] = useState('')
+  const [adding, setAdding] = useState(false)
 
   useEffect(() => {
     let ignore = false
@@ -104,6 +108,37 @@ export default function ItemsPage() {
       ),
     )
     setProcessing(null)
+  }
+
+  async function handleAddItem() {
+    if (!addTitle.trim()) {
+      return
+    }
+
+    setAdding(true)
+    setError(null)
+
+    const response = await fetch(`/api/projects/${projectId}/items`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: addTitle.trim(),
+        ...(addCategory.trim() ? { category: addCategory.trim() } : {}),
+      }),
+    })
+
+    if (!response.ok) {
+      setError(await readError(response, 'Item konnte nicht angelegt werden.'))
+      setAdding(false)
+      return
+    }
+
+    const data = (await response.json()) as { item: Item }
+    setItems((current) => [...current, data.item])
+    setAddTitle('')
+    setAddCategory('')
+    setShowAddForm(false)
+    setAdding(false)
   }
 
   const hasListings = items.some((item) => item.status === 'listing_created')
@@ -186,7 +221,7 @@ export default function ItemsPage() {
                       <div>
                         <h2 style={{ margin: 0, fontSize: '1.2rem' }}>{item.title}</h2>
                         <p style={{ margin: '0.35rem 0 0', color: '#6f624e' }}>
-                          {item.category}
+                          {item.category || 'Ohne Kategorie'}
                           {item.condition ? ` · ${item.condition}` : ''}
                         </p>
                       </div>
@@ -283,6 +318,71 @@ export default function ItemsPage() {
             </Link>
           </div>
         ) : null}
+
+        {!loading ? (
+          <section style={{ marginTop: '2rem' }}>
+            {!showAddForm ? (
+              <button
+                type="button"
+                onClick={() => setShowAddForm(true)}
+                style={secondaryButtonStyle}
+              >
+                + Item manuell hinzufügen
+              </button>
+            ) : (
+              <div style={cardStyle}>
+                <h2 style={{ marginTop: 0, fontSize: '1.1rem' }}>Item hinzufügen</h2>
+                <div style={{ display: 'grid', gap: '0.75rem' }}>
+                  <label style={{ display: 'grid', gap: '0.35rem' }}>
+                    <span style={{ fontWeight: 700 }}>Bezeichnung *</span>
+                    <input
+                      value={addTitle}
+                      onChange={(event) => setAddTitle(event.currentTarget.value)}
+                      placeholder="z. B. IKEA Kallax Regal"
+                      style={inputStyle}
+                    />
+                  </label>
+                  <label style={{ display: 'grid', gap: '0.35rem' }}>
+                    <span style={{ fontWeight: 700 }}>Kategorie</span>
+                    <input
+                      value={addCategory}
+                      onChange={(event) => setAddCategory(event.currentTarget.value)}
+                      placeholder="z. B. Möbel"
+                      style={inputStyle}
+                    />
+                  </label>
+                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      onClick={() => void handleAddItem()}
+                      disabled={adding || !addTitle.trim()}
+                      style={{
+                        ...buttonStyle,
+                        background: adding || !addTitle.trim() ? '#8d8476' : '#1f6f5f',
+                        color: '#ffffff',
+                        border: 0,
+                        cursor: adding || !addTitle.trim() ? 'not-allowed' : 'pointer',
+                      }}
+                    >
+                      {adding ? 'Wird angelegt...' : 'Hinzufügen'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowAddForm(false)
+                        setAddTitle('')
+                        setAddCategory('')
+                      }}
+                      style={secondaryButtonStyle}
+                    >
+                      Abbrechen
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
+        ) : null}
       </section>
     </main>
   )
@@ -370,6 +470,28 @@ const buttonStyle = {
   padding: '0.8rem 1rem',
   borderRadius: '999px',
   fontWeight: 700,
+} satisfies React.CSSProperties
+
+const secondaryButtonStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0.8rem 1rem',
+  borderRadius: '999px',
+  background: '#efe6d6',
+  color: '#4e463b',
+  border: 0,
+  fontWeight: 700,
+  cursor: 'pointer',
+} satisfies React.CSSProperties
+
+const inputStyle = {
+  width: '100%',
+  padding: '0.85rem 0.95rem',
+  borderRadius: '0.85rem',
+  border: '1px solid #cfc4b2',
+  background: '#fffdf8',
+  color: '#2d2a24',
 } satisfies React.CSSProperties
 
 const primaryLinkStyle = {
