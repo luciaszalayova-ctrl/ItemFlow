@@ -118,8 +118,8 @@ model ItemCandidate {
   id                 String          @id @default(cuid())
   projectId          String
   project            Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  assetId            String
-  asset              Asset           @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  assetId            String?
+  asset              Asset?          @relation(fields: [assetId], references: [id], onDelete: SetNull)
   rawLabel           String
   normalizedName     String
   category           String

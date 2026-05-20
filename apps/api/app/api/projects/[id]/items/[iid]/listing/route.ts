@@ -113,7 +113,13 @@ export async function POST(
         })
       : []
 
-  const photoAssetIds = Array.from(new Set(sourceCandidates.map((candidate) => candidate.assetId)))
+  const photoAssetIds = Array.from(
+    new Set(
+      sourceCandidates
+        .map((candidate) => candidate.assetId)
+        .filter((assetId): assetId is string => assetId !== null),
+    ),
+  )
 
   const generator = new TemplateListingGenerator()
   const raw = await generator.generate({

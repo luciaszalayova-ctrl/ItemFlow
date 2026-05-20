@@ -6,7 +6,7 @@ export type CandidateStatus = z.infer<typeof CandidateStatusSchema>
 export const ItemCandidateSchema = z.object({
   id: z.string(),
   projectId: z.string(),
-  assetId: z.string(),
+  assetId: z.string().nullable(),
   rawLabel: z.string(),
   normalizedName: z.string(),
   category: z.string(),
