@@ -124,31 +124,31 @@ export default function ChatGptImportPage() {
             }}
           >
             <h2 style={{ margin: 0, fontSize: '1.1rem' }}>ChatGPT-Prompt anzeigen</h2>
-            <button
-              type="button"
-              onClick={() => setShowPrompt((current) => !current)}
-              style={secondaryButtonStyle}
-            >
-              {showPrompt ? 'Prompt ausblenden' : 'Prompt anzeigen'}
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+              <button
+                type="button"
+                onClick={() => void handleCopyPrompt()}
+                style={{
+                  ...secondaryButtonStyle,
+                  background: promptCopied ? '#1f6f5f' : '#efe6d6',
+                  color: promptCopied ? '#ffffff' : '#4e463b',
+                }}
+              >
+                {promptCopied ? 'Prompt kopiert ✓' : 'Prompt kopieren'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowPrompt((current) => !current)}
+                style={secondaryButtonStyle}
+              >
+                {showPrompt ? 'Prompt ausblenden' : 'Prompt anzeigen'}
+              </button>
+            </div>
           </div>
 
           {showPrompt ? (
             <div style={{ marginTop: '1rem', display: 'grid', gap: '0.75rem' }}>
               <pre style={promptStyle}>{MANUAL_PROMPT}</pre>
-              <div>
-                <button
-                  type="button"
-                  onClick={() => void handleCopyPrompt()}
-                  style={{
-                    ...secondaryButtonStyle,
-                    background: promptCopied ? '#1f6f5f' : '#efe6d6',
-                    color: promptCopied ? '#ffffff' : '#4e463b',
-                  }}
-                >
-                  {promptCopied ? 'Prompt kopiert ✓' : 'Prompt kopieren'}
-                </button>
-              </div>
             </div>
           ) : null}
         </section>
