@@ -29,6 +29,7 @@ enum InventoryItemStatus {
   scored
   listing_created
   handled
+  done
 }
 
 enum BundleStatus {

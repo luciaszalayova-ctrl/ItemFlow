@@ -6,6 +6,7 @@ export const InventoryItemStatusSchema = z.enum([
   'scored',
   'listing_created',
   'handled',
+  'done',
 ])
 export type InventoryItemStatus = z.infer<typeof InventoryItemStatusSchema>
 
@@ -38,5 +39,6 @@ export const UpdateInventoryItemSchema = z.object({
   description: z.string().nullable().optional(),
   defects: z.string().nullable().optional(),
   completeness: z.string().nullable().optional(),
+  status: z.enum(['ready_for_scoring', 'scored', 'done']).optional(),
 })
 export type UpdateInventoryItem = z.infer<typeof UpdateInventoryItemSchema>

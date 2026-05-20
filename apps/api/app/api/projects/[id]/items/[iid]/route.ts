@@ -99,10 +99,6 @@ export async function PATCH(
     return Response.json({ error: 'Not found' }, { status: 404 })
   }
 
-  if (item.status !== 'draft' && item.status !== 'ready_for_scoring') {
-    return Response.json({ error: 'Item cannot be edited in current status' }, { status: 409 })
-  }
-
   let body: unknown
   try {
     body = await request.json()
@@ -116,6 +112,21 @@ export async function PATCH(
       { error: 'Invalid input', details: parsed.error.flatten() },
       { status: 400 },
     )
+  }
+
+  const isStatusOnlyUpdate =
+    parsed.data.status !== undefined && Object.keys(parsed.data).length === 1
+
+  if (isStatusOnlyUpdate) {
+    if (
+      item.status !== 'ready_for_scoring' &&
+      item.status !== 'scored' &&
+      item.status !== 'done'
+    ) {
+      return Response.json({ error: 'Item cannot be edited in current status' }, { status: 409 })
+    }
+  } else if (item.status !== 'draft' && item.status !== 'ready_for_scoring') {
+    return Response.json({ error: 'Item cannot be edited in current status' }, { status: 409 })
   }
 
   const updated = await prisma.inventoryItem.update({

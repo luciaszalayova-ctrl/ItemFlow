@@ -32,6 +32,7 @@ export default function ItemsPage() {
   const [addTitle, setAddTitle] = useState('')
   const [addCategory, setAddCategory] = useState('')
   const [adding, setAdding] = useState(false)
+  const [hideDone, setHideDone] = useState(true)
 
   useEffect(() => {
     let ignore = false
@@ -141,7 +142,32 @@ export default function ItemsPage() {
     setAdding(false)
   }
 
+  async function handleToggleDone(itemId: string, currentStatus: string) {
+    const newStatus = currentStatus === 'done' ? 'ready_for_scoring' : 'done'
+
+    setProcessing(itemId)
+    setError(null)
+
+    const response = await fetch(`/api/projects/${projectId}/items/${itemId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus }),
+    })
+
+    if (!response.ok) {
+      setError(await readError(response, 'Item konnte nicht aktualisiert werden.'))
+      setProcessing(null)
+      return
+    }
+
+    setItems((current) =>
+      current.map((item) => (item.id === itemId ? { ...item, status: newStatus } : item)),
+    )
+    setProcessing(null)
+  }
+
   const hasListings = items.some((item) => item.status === 'listing_created')
+  const visibleItems = hideDone ? items.filter((item) => item.status !== 'done') : items
 
   return (
     <main
@@ -187,6 +213,25 @@ export default function ItemsPage() {
           </p>
         ) : null}
 
+        {!loading && items.length > 0 ? (
+          <label
+            style={{
+              marginTop: '1.5rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              color: '#5c5346',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={hideDone}
+              onChange={(event) => setHideDone(event.currentTarget.checked)}
+            />
+            Erledigte ausblenden
+          </label>
+        ) : null}
+
         {loading ? (
           <section style={cardStyle}>
             <p style={{ margin: 0 }}>Items werden geladen...</p>
@@ -201,9 +246,17 @@ export default function ItemsPage() {
               Zu den Candidates
             </Link>
           </section>
+        ) : visibleItems.length === 0 ? (
+          <section style={emptyCardStyle}>
+            <h2 style={{ marginTop: 0 }}>Alle sichtbaren Items erledigt</h2>
+            <p style={{ lineHeight: 1.6 }}>
+              Aktiviere die Anzeige erledigter Items, um abgeschlossene Einträge wieder
+              einzublenden.
+            </p>
+          </section>
         ) : (
           <ul style={listStyle}>
-            {items.map((item) => {
+            {visibleItems.map((item) => {
               const score = scores[item.id]
               const isProcessing = processing === item.id
 
@@ -304,6 +357,31 @@ export default function ItemsPage() {
                         Listing ansehen →
                       </Link>
                     ) : null}
+
+                    <button
+                      type="button"
+                      onClick={() => void handleToggleDone(item.id, item.status)}
+                      disabled={isProcessing || item.status === 'listing_created'}
+                      style={
+                        item.status === 'done'
+                          ? {
+                              ...doneButtonActiveStyle,
+                              cursor: isProcessing ? 'progress' : 'pointer',
+                              opacity: isProcessing ? 0.7 : 1,
+                            }
+                          : {
+                              ...doneButtonStyle,
+                              cursor:
+                                isProcessing || item.status === 'listing_created'
+                                  ? 'not-allowed'
+                                  : 'pointer',
+                              opacity:
+                                isProcessing || item.status === 'listing_created' ? 0.7 : 1,
+                            }
+                      }
+                    >
+                      {item.status === 'done' ? 'Erledigt ✓' : 'Als erledigt markieren'}
+                    </button>
                   </div>
                 </li>
               )
@@ -399,6 +477,8 @@ async function readError(response: Response, fallback: string) {
 
 function formatStatus(status: string) {
   switch (status) {
+    case 'done':
+      return 'Erledigt'
     case 'ready_for_scoring':
       return 'Bereit für Scoring'
     case 'listing_created':
@@ -483,6 +563,24 @@ const secondaryButtonStyle = {
   border: 0,
   fontWeight: 700,
   cursor: 'pointer',
+} satisfies React.CSSProperties
+
+const doneButtonStyle = {
+  padding: '0.5rem 0.85rem',
+  borderRadius: '999px',
+  border: '1px solid #cfc5b6',
+  background: '#ffffff',
+  color: '#5c5346',
+  fontWeight: 700,
+} satisfies React.CSSProperties
+
+const doneButtonActiveStyle = {
+  padding: '0.5rem 0.85rem',
+  borderRadius: '999px',
+  border: '1px solid #a8d5c2',
+  background: '#eef8f3',
+  color: '#1f6f5f',
+  fontWeight: 700,
 } satisfies React.CSSProperties
 
 const inputStyle = {
