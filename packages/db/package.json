@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "build": "tsc --project tsconfig.json",
+    "build": "prisma generate --schema prisma/schema.prisma && tsc --project tsconfig.json",
     "typecheck": "tsc --project tsconfig.json --noEmit",
     "lint": "eslint . --ext .ts --max-warnings=0",
     "test": "node -e \"console.log('No tests yet for @itemflow/db')\"",
