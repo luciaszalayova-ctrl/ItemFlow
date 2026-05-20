@@ -15,6 +15,8 @@ type InventoryItem = {
   description: string | null
   defects: string | null
   completeness: string | null
+  scoringRecommendation?: string | null
+  scoringOverride?: string | null
   status: string
 }
 
@@ -80,6 +82,7 @@ export default function EditItemPage() {
         description: item.description || null,
         defects: item.defects || null,
         completeness: item.completeness || null,
+        scoringOverride: item.scoringOverride ?? null,
       }),
     })
 
@@ -255,6 +258,32 @@ export default function EditItemPage() {
                 />
               </label>
 
+              {item.scoringRecommendation ? (
+                <div style={fieldStyle}>
+                  <span>Empfehlung der Engine</span>
+                  <p style={{ margin: 0, color: '#5c5346' }}>
+                    {labelFor(item.scoringRecommendation)}
+                  </p>
+
+                  <span style={{ marginTop: '0.5rem' }}>Meine Entscheidung (optional)</span>
+                  <select
+                    value={item.scoringOverride ?? ''}
+                    onChange={(event) =>
+                      updateField('scoringOverride', event.currentTarget.value || null)
+                    }
+                    disabled={saving}
+                    style={inputStyle}
+                  >
+                    <option value="">— Engine-Empfehlung übernehmen —</option>
+                    <option value="sell_individually">Einzeln verkaufen</option>
+                    <option value="bundle">Bündeln</option>
+                    <option value="donate">Spenden</option>
+                    <option value="give_away">Verschenken</option>
+                    <option value="recycle_dispose">Recyceln / Entsorgen</option>
+                  </select>
+                </div>
+              ) : null}
+
               <label style={fieldStyle}>
                 <span>Mängel (optional)</span>
                 <textarea
@@ -290,7 +319,7 @@ export default function EditItemPage() {
                     cursor: saving ? 'progress' : 'pointer',
                   }}
                 >
-                  {saving ? 'Speichert...' : 'Aenderungen speichern'}
+                  {saving ? 'Speichert...' : 'Änderungen speichern'}
                 </button>
               </div>
             </form>
@@ -312,6 +341,19 @@ async function readError(response: Response, fallback: string) {
   } catch {
     return fallback
   }
+}
+
+function labelFor(recommendation: string): string {
+  const labels: Record<string, string> = {
+    sell_individually: 'Einzeln verkaufen',
+    bundle: 'Bündeln',
+    donate: 'Spenden',
+    give_away: 'Verschenken',
+    recycle_dispose: 'Recyceln / Entsorgen',
+    needs_review: 'Prüfen',
+  }
+
+  return labels[recommendation] ?? recommendation
 }
 
 const backLinkStyle = {

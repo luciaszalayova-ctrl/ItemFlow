@@ -79,6 +79,7 @@ Explizit **nicht** im MVP:
 | E10 | Export und Copy | P1 |
 | E11 | Testing-Infrastruktur | P1 |
 | E12 | Datenloeschung und Datenschutz | P1 |
+| E13 | UX-Friction-Reduktion | Backlog |
 
 ---
 
@@ -157,6 +158,29 @@ Explizit **nicht** im MVP:
 
 - **US-1201** Als Nutzer kann ich ein gesamtes Projekt loeschen (Fotos, Kandidaten, Gegenstaende, Listings, Logs).
   - Akzeptanz: Alle verknuepften Daten werden entfernt. Storage-Objekte werden geloescht.
+
+### E13 - UX-Friction-Reduktion
+
+Ziel: Den Weg von Foto zu fertigem Listing-Entwurf auf so wenige manuelle Schritte wie moeglich reduzieren. Kein Schritt, der nicht noetig ist.
+
+- **IF-048 / US-1301** Als Nutzer kann ich direkt mit dem Upload starten, ohne vorher einen Projektnamen eintippen zu muessen.
+  - Hintergrund: Der Projekterstellungsschritt ist eine unnoetige Huerde fuer neue Nutzer. Ein generierter Name reicht als Startpunkt.
+  - Akzeptanz: Auf der Startseite gibt es einen "Starten"-Einstiegspunkt (Upload oder Import), der im Hintergrund automatisch ein Projekt mit dem Namen "Projekt [TT. Monat JJJJ]" anlegt. Der Name kann spaeter bearbeitet werden. Kein Pflichtformular vor dem ersten Upload.
+
+- **IF-049 / US-1302** Als Nutzer werden Kandidaten mit hoher Konfidenz automatisch akzeptiert, damit ich nur unsichere Faelle manuell pruefen muss.
+  - Hintergrund: Bei 20+ Gegenstaenden ist das einzelne Durchklicken der groesste Zeitfresser im Flow.
+  - Akzeptanz: Kandidaten mit `confidence >= Schwellwert` (Standard: 0.85, in den Projekteinstellungen anpassbar) werden beim Import automatisch als `InventoryItem` angelegt. Kandidaten unterhalb des Schwellwerts landen im manuellen Review-Queue. Die Zusammenfassung "X automatisch uebernommen, Y zur Pruefung" wird angezeigt.
+
+- **IF-050 / US-1303** Als Nutzer kann ich mehrere Kandidaten auf einmal akzeptieren oder ablehnen.
+  - Akzeptanz: Candidates-Liste hat Checkboxen und einen "Auswahl akzeptieren / Auswahl ablehnen"-Button. "Alle auswaehlen" ist moeglich. Ergaenzt IF-049, ersetzt es nicht.
+
+- **IF-051 / US-1304** Als Nutzer kann ich mit einem Klick Listing-Entwuerfe fuer alle verkaufbaren Items eines Projekts generieren lassen.
+  - Hintergrund: Aktuell muss das Listing pro Item einzeln ausgeloest werden.
+  - Akzeptanz: Button "Listings fuer alle Items generieren" auf der Items-Seite. Danach Batch-Review-Ansicht: alle Entwuerfe untereinander, mit Inline-Bearbeitungsmoeglichkeit und Sammel-Freigabe ("Alle freigegebenen exportieren").
+
+- **IF-052 / US-1305** Als Nutzer kann ich den ChatGPT-Prompt per Direktlink oeffnen, ohne ihn manuell kopieren zu muessen.
+  - Hintergrund: Kurzfristiger Quick-Win bis eine direkte Vision-Integration verfuegbar ist.
+  - Akzeptanz: Button "In ChatGPT oeffnen" oeffnet einen neuen Tab mit dem vorausgefuellten Prompt. Nutzer muss nur noch Fotos anhaengen. Kein manuelles Kopieren des Prompts noetig.
 
 ---
 
@@ -294,6 +318,21 @@ Explizit **nicht** im MVP:
 | T-1201 | `DELETE /api/projects/:id` - Projekt mit allen Abhaengigkeiten loeschen | P1 | Codex |
 | T-1202 | Kaskadenloeschung in Prisma konfigurieren | P1 | Codex (Review: Claude Code) |
 | T-1203 | Storage-Bereinigung beim Loeschen von Assets sicherstellen | P1 | Codex |
+
+### E13 - UX-Friction-Reduktion
+
+| IF | ID | Aufgabe | Prioritaet | Geeignet fuer |
+|----|----|---------|------------|----------------|
+| IF-048 | T-1301 | Zero-friction-Einstieg: Projekt automatisch mit "Projekt [TT. Monat JJJJ]" anlegen, kein Pflichtformular | Backlog | Codex |
+| IF-048 | T-1302 | Projektnamen-Inline-Bearbeitung auf der Projekt-Uebersicht (nachtraegliche Umbenennung) | Backlog | Codex |
+| IF-049 | T-1303 | Auto-Accept-Logik: `confidence >= Schwellwert` -> direkt als `InventoryItem` | Backlog | Claude Code |
+| IF-049 | T-1304 | Schwellenwert-Setting im Projekt speichern (`settings`-JSON im `Project`-Modell) | Backlog | Codex |
+| IF-049 | T-1305 | Import-Zusammenfassungs-UI: "X automatisch uebernommen, Y zur Pruefung" | Backlog | Codex |
+| IF-050 | T-1306 | Checkboxen + Bulk-Accept/Reject in der Candidates-Liste | Backlog | Codex |
+| IF-051 | T-1307 | `POST /api/projects/:id/listings/generate-all` - Listings fuer alle scored Items in einem Request | Backlog | Claude Code |
+| IF-051 | T-1308 | Batch-Review-Ansicht: alle Listing-Entwuerfe eines Projekts untereinander mit Inline-Edit | Backlog | Codex |
+| IF-051 | T-1309 | Sammel-Freigabe-Button: alle markierten Listings auf `reviewed` setzen | Backlog | Codex |
+| IF-052 | T-1310 | ChatGPT-Direktlink-Generator: Prompt URL-kodiert als `https://chatgpt.com/?q=...` oeffnen | Backlog | Codex |
 
 ---
 

@@ -210,8 +210,13 @@ export default function CandidatesPage() {
                         Rohlabel: {candidate.rawLabel}
                       </p>
                     </div>
-                    <span style={metaPillStyle}>
+                    <span
+                      style={
+                        candidate.confidence < 0.6 ? lowConfidencePillStyle : metaPillStyle
+                      }
+                    >
                       {Math.round(candidate.confidence * 100)} % Konfidenz
+                      {candidate.confidence < 0.6 ? ' ⚠' : ''}
                     </span>
                   </div>
 
@@ -397,6 +402,16 @@ const metaPillStyle = {
   background: '#efe6d6',
   color: '#6f624e',
   fontSize: '0.9rem',
+} satisfies React.CSSProperties
+
+const lowConfidencePillStyle = {
+  alignSelf: 'flex-start',
+  padding: '0.35rem 0.65rem',
+  borderRadius: '999px',
+  background: '#fef3cd',
+  color: '#7a5400',
+  fontSize: '0.9rem',
+  fontWeight: 700,
 } satisfies React.CSSProperties
 
 const buttonStyle = {
