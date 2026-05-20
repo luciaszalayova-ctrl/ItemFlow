@@ -31,7 +31,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound()
   }
 
-  const [candidateCount, itemCount, listingCount] = await Promise.all([
+  const [candidateCount, itemCount, listingCount, bundleCount] = await Promise.all([
     prisma.itemCandidate.count({
       where: {
         projectId: id,
@@ -45,6 +45,12 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       where: {
         projectId: id,
         status: { in: ['draft', 'reviewed'] },
+      },
+    }),
+    prisma.bundle.count({
+      where: {
+        projectId: id,
+        status: { notIn: ['rejected'] },
       },
     }),
   ])
@@ -64,6 +70,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       href: `/projects/${id}/items`,
       label: `Items bearbeiten (${itemCount} gesamt)`,
       meta: 'Titel, Zustand und Details fuer das Scoring verfeinern',
+    },
+    {
+      href: `/projects/${id}/bundles`,
+      label: `Bundles (${bundleCount} gesamt)`,
+      meta: 'Guenstige Artikel zu Paketen buendeln und gemeinsam anbieten',
     },
     {
       href: `/projects/${id}/listings`,
@@ -103,6 +114,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <div style={summaryGridStyle}>
             <StatCard label="Candidates offen" value={candidateCount} />
             <StatCard label="Items gesamt" value={itemCount} />
+            <StatCard label="Bundles" value={bundleCount} />
             <StatCard label="Listings offen" value={listingCount} />
             <StatCard label="Erstellt am" value={formatDate(project.createdAt)} />
           </div>
