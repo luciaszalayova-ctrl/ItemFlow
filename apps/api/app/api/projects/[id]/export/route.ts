@@ -32,6 +32,10 @@ const exportSelect = {
   updatedAt: true,
 } as const
 
+type LoggableListing = Pick<ExportListing, 'id' | 'targetType'> & {
+  platform?: string
+}
+
 export async function GET(request: Request, context: RouteContext) {
   const session = await auth()
   if (!session?.user?.userId) {
@@ -66,6 +70,11 @@ export async function GET(request: Request, context: RouteContext) {
     orderBy: { createdAt: 'asc' },
   })
 
+  await logExportActions({
+    format,
+    listings,
+  })
+
   if (format === 'csv') {
     const csv = toCsv(listings)
     return new Response(csv, {
@@ -94,6 +103,35 @@ export async function GET(request: Request, context: RouteContext) {
       },
     },
   )
+}
+
+async function logExportActions({
+  format,
+  listings,
+}: {
+  format: 'json' | 'csv'
+  listings: LoggableListing[]
+}) {
+  if (listings.length === 0) {
+    return
+  }
+
+  try {
+    await prisma.marketplaceActionLog.createMany({
+      data: listings.map((listing) => ({
+        listingDraftId: listing.id,
+        marketplace: listing.platform ?? listing.targetType,
+        actionType: 'export',
+        status: 'completed',
+        detailsJson: {
+          format,
+          listingCount: listings.length,
+        },
+      })),
+    })
+  } catch {
+    // Exporte sollen auch dann funktionieren, wenn das Logging fehlschlaegt.
+  }
 }
 
 function toCsv(listings: ExportListing[]): string {
@@ -127,7 +165,7 @@ function toCsv(listings: ExportListing[]): string {
 }
 
 function escapeCsvField(value: string): string {
-  if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+  if (value.includes(',') || value.includes('"') || value.includes('\n') || value.includes('\r')) {
     return `"${value.replace(/"/g, '""')}"`
   }
 

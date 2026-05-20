@@ -33,9 +33,19 @@ type ExportResult = {
   count: number
 }
 
+type ActionLogEntry = {
+  id: string
+  marketplace: string
+  actionType: string
+  status: string
+  detailsJson: { format?: string; listingCount?: number } | null
+  createdAt: string
+}
+
 export default function ListingsPage() {
   const { id: projectId } = useParams<{ id: string }>()
   const [listings, setListings] = useState<ListingDraft[]>([])
+  const [actionLog, setActionLog] = useState<ActionLogEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
@@ -50,7 +60,11 @@ export default function ListingsPage() {
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`/api/projects/${projectId}/listings`)
+      const [response, logResponse] = await Promise.all([
+        fetch(`/api/projects/${projectId}/listings`),
+        fetch(`/api/projects/${projectId}/action-log`),
+      ])
+
       if (!response.ok) {
         if (!ignore) {
           setError('Listings konnten nicht geladen werden.')
@@ -62,6 +76,10 @@ export default function ListingsPage() {
       const data = (await response.json()) as { listings?: ListingDraft[] }
       if (!ignore) {
         setListings(data.listings ?? [])
+        if (logResponse.ok) {
+          const logData = (await logResponse.json()) as { logs?: ActionLogEntry[] }
+          setActionLog(logData.logs ?? [])
+        }
         setLoading(false)
       }
     }
@@ -181,16 +199,21 @@ export default function ListingsPage() {
           <p style={{ margin: 0, color: '#7b6f5b' }}>Listing-Workflow</p>
           <h1 style={{ marginTop: '0.5rem', marginBottom: '0.75rem' }}>Listings</h1>
           <p style={{ marginTop: 0, color: '#5c5346', lineHeight: 1.6 }}>
-            Prüfe erzeugte Entwürfe, gib passende Listings frei und exportiere sie als JSON für
-            den manuellen Upload.
+            Prüfe erzeugte Entwürfe, gib passende Listings frei und exportiere sie für den
+            manuellen Upload.
           </p>
-          <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <a href={`/api/projects/${projectId}/export?format=json`} download style={exportLinkStyle}>
-              Als JSON exportieren
-            </a>
-            <a href={`/api/projects/${projectId}/export?format=csv`} download style={exportLinkStyle}>
-              Als CSV exportieren
-            </a>
+          <div style={{ marginTop: '1rem' }}>
+            <p style={{ margin: '0 0 0.5rem', fontSize: '0.85rem', color: '#7b6f5b' }}>
+              Alle Listings herunterladen (vollständige Übersicht):
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <a href={`/api/projects/${projectId}/export?format=json`} download style={exportLinkStyle}>
+                JSON herunterladen
+              </a>
+              <a href={`/api/projects/${projectId}/export?format=csv`} download style={exportLinkStyle}>
+                CSV herunterladen
+              </a>
+            </div>
           </div>
         </header>
 
@@ -252,6 +275,30 @@ export default function ListingsPage() {
                 </button>
               </div>
             </div>
+          </section>
+        ) : null}
+
+        {actionLog.length > 0 ? (
+          <section style={actionLogStyle}>
+            <h2 style={{ fontSize: '1rem', color: '#5c5346', margin: 0 }}>Letzte Exporte</h2>
+            <ul
+              style={{
+                listStyle: 'none',
+                padding: 0,
+                margin: '0.75rem 0 0',
+                display: 'grid',
+                gap: '0.4rem',
+              }}
+            >
+              {actionLog.map((entry) => (
+                <li key={entry.id} style={{ color: '#7b6f5b', fontSize: '0.9rem' }}>
+                  {formatAction(entry)} — {new Date(entry.createdAt).toLocaleString('de-DE')}
+                  {entry.detailsJson?.listingCount != null
+                    ? ` (${entry.detailsJson.listingCount} Listings)`
+                    : ''}
+                </li>
+              ))}
+            </ul>
           </section>
         ) : null}
 
@@ -405,6 +452,20 @@ function formatStatus(status: string) {
   }
 }
 
+function formatAction(entry: ActionLogEntry) {
+  const format = entry.detailsJson?.format
+
+  if (entry.actionType === 'export' && format === 'json') {
+    return 'JSON-Export'
+  }
+
+  if (entry.actionType === 'export' && format === 'csv') {
+    return 'CSV-Export'
+  }
+
+  return `${entry.actionType} (${entry.marketplace})`
+}
+
 function formatEuro(cents: number) {
   return `${(cents / 100).toFixed(2)} €`
 }
@@ -446,6 +507,14 @@ const exportCardStyle = {
   borderRadius: '1rem',
   background: '#f3f8ff',
   border: '1px solid #d6e3f5',
+} satisfies React.CSSProperties
+
+const actionLogStyle = {
+  marginTop: '1.5rem',
+  padding: '1rem',
+  borderRadius: '1rem',
+  background: '#fffaf0',
+  border: '1px solid #e5d9c4',
 } satisfies React.CSSProperties
 
 const metaPillStyle = {
