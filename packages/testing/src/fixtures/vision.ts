@@ -51,10 +51,10 @@ export const FIXTURE_IKEA_REGAL: VisionCandidateRaw[] = [
 
 export const FIXTURE_BOSCH_AKKU: VisionCandidateRaw[] = [
   {
-    rawLabel: "Bosch Akkuschrauber mit Ladegeraet",
-    normalizedName: "Bosch Akkuschrauber mit Ladegeraet",
+    rawLabel: "Bosch Akkuschrauber mit Ladegerät",
+    normalizedName: "Bosch Akkuschrauber mit Ladegerät",
     category: "tools",
-    attributes: { brand: "Bosch", includedItems: ["Akkuschrauber", "Ladegeraet"] },
+    attributes: { brand: "Bosch", includedItems: ["Akkuschrauber", "Ladegerät"] },
     confidence: 0.93,
     bundlePotential: false
   }

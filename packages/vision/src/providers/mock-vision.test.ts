@@ -28,7 +28,7 @@ const FIXTURE_KABEL_CHAOS: VisionCandidateRaw[] = [
 ];
 
 describe("MockVisionProvider", () => {
-  it("gibt fuer einen bekannten Key konfigurierte Candidates zurueck", async () => {
+  it("gibt füreinen bekannten Key konfigurierte Candidates zurück", async () => {
     const provider = new MockVisionProvider(
       new Map<string, VisionCandidateRaw[]>([["ikea-regal", FIXTURE_IKEA_REGAL]])
     );
@@ -42,7 +42,7 @@ describe("MockVisionProvider", () => {
     expect(result.candidates).toEqual(FIXTURE_IKEA_REGAL);
   });
 
-  it("gibt fuer einen unbekannten Key defaultCandidates zurueck", async () => {
+  it("gibt füreinen unbekannten Key defaultCandidates zurück", async () => {
     const provider = new MockVisionProvider(
       new Map<string, VisionCandidateRaw[]>(),
       FIXTURE_KABEL_CHAOS
@@ -57,7 +57,7 @@ describe("MockVisionProvider", () => {
     expect(result.candidates).toEqual(FIXTURE_KABEL_CHAOS);
   });
 
-  it("gibt bei leeren defaultCandidates ein leeres Array zurueck", async () => {
+  it("gibt bei leeren defaultCandidates ein leeres Array zurück", async () => {
     const provider = new MockVisionProvider(new Map<string, VisionCandidateRaw[]>());
 
     const result = await provider.analyze({
@@ -69,7 +69,7 @@ describe("MockVisionProvider", () => {
     expect(result.candidates).toEqual([]);
   });
 
-  it("liefert einen Rueckgabewert, der die VisionOutputSchema-Validierung besteht", async () => {
+  it("liefert einen Rückgabewert, der die VisionOutputSchema-Validierung besteht", async () => {
     const provider = new MockVisionProvider(
       new Map<string, VisionCandidateRaw[]>([["ikea-regal", FIXTURE_IKEA_REGAL]])
     );

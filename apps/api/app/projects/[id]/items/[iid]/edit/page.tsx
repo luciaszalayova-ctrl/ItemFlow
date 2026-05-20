@@ -111,7 +111,7 @@ export default function EditItemPage() {
         }}
       >
         <Link href={`/projects/${projectId}/items`} style={backLinkStyle}>
-          ← Zurueck zu den Items
+          ← Zurück zu den Items
         </Link>
 
         <header style={{ marginTop: '1.5rem' }}>

@@ -17,7 +17,7 @@ afterEach(async () => {
 });
 
 describe("LocalFileSystemStorageProvider", () => {
-  it("upload() schreibt Datei und gibt korrektes Ergebnis zurueck", async () => {
+  it("upload() schreibt Datei und gibt korrektes Ergebnis zurück", async () => {
     const basePath = await createTemporaryDirectory();
     const provider = new LocalFileSystemStorageProvider(basePath);
     const buffer = Buffer.from("hello itemflow");
@@ -40,7 +40,7 @@ describe("LocalFileSystemStorageProvider", () => {
     });
   });
 
-  it("upload() erstellt verschachtelte Verzeichnisse wenn noetig", async () => {
+  it("upload() erstellt verschachtelte Verzeichnisse wenn nötig", async () => {
     const basePath = await createTemporaryDirectory();
     const provider = new LocalFileSystemStorageProvider(basePath);
 
@@ -55,7 +55,7 @@ describe("LocalFileSystemStorageProvider", () => {
     await expect(access(join(basePath, "nested/deep/folder/photo.bin"))).resolves.toBeUndefined();
   });
 
-  it("delete() loescht existierende Datei", async () => {
+  it("delete() löscht existierende Datei", async () => {
     const basePath = await createTemporaryDirectory();
     const provider = new LocalFileSystemStorageProvider(basePath);
     const key = "delete-me/file.txt";
@@ -76,7 +76,7 @@ describe("LocalFileSystemStorageProvider", () => {
     await expect(provider.delete("missing/file.txt")).resolves.toBeUndefined();
   });
 
-  it("getUrl() gibt den erwarteten Pfad zurueck", async () => {
+  it("getUrl() gibt den erwarteten Pfad zurück", async () => {
     const basePath = await createTemporaryDirectory();
     const provider = new LocalFileSystemStorageProvider(basePath);
 

@@ -68,13 +68,13 @@ const VISION_SEED_FIXTURES: SeedFixture[] = [
   {
     fileName: "bosch-akku.jpg",
     candidate: {
-      rawLabel: "Bosch Akkuschrauber mit Ladegeraet",
-      normalizedName: "Bosch Akkuschrauber mit Ladegeraet",
+      rawLabel: "Bosch Akkuschrauber mit Ladegerät",
+      normalizedName: "Bosch Akkuschrauber mit Ladegerät",
       category: "tools",
       confidence: 0.93,
       attributes: {
         brand: "Bosch",
-        includedItems: ["Akkuschrauber", "Ladegeraet"]
+        includedItems: ["Akkuschrauber", "Ladegerät"]
       },
       bundlePotential: false
     }
@@ -177,7 +177,7 @@ async function main(): Promise<void> {
     data: [
       {
         projectId: project.id,
-        title: "Bosch Akkuschrauber mit Ladegeraet",
+        title: "Bosch Akkuschrauber mit Ladegerät",
         category: "tools",
         brand: "Bosch",
         condition: "gut",

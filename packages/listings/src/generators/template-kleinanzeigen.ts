@@ -8,8 +8,8 @@ import type {
   SupportedPlatform
 } from "../index.js";
 
-const KLEINANZEIGEN_SHIPPING_MODE = "Abholung bevorzugt, Versand auf Anfrage moeglich.";
-const KLEINANZEIGEN_DISCLAIMER = "Privatverkauf, keine Garantie oder Ruecknahme.";
+const KLEINANZEIGEN_SHIPPING_MODE = "Abholung bevorzugt, Versand auf Anfrage möglich.";
+const KLEINANZEIGEN_DISCLAIMER = "Privatverkauf, keine Garantie oder Rücknahme.";
 const ITEM_PHOTO_RECOMMENDATIONS = ["Frontansicht", "Zustandsdetail"];
 const BUNDLE_PHOTO_RECOMMENDATIONS = ["Alle Teile gemeinsam", "Einzelne Highlights"];
 

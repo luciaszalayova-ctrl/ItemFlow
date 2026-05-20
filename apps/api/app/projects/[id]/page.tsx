@@ -59,32 +59,32 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     {
       href: `/projects/${id}/upload`,
       label: 'Fotos hochladen',
-      meta: 'Bilder fuer die automatische Erkennung erfassen',
+      meta: 'Bilder für die automatische Erkennung erfassen',
     },
     {
       href: `/projects/${id}/import`,
       label: 'ChatGPT importieren',
-      meta: 'JSON-Analyse aus ChatGPT einfuegen und als Candidates importieren',
+      meta: 'JSON-Analyse aus ChatGPT einfügen und als Candidates importieren',
     },
     {
       href: `/projects/${id}/candidates`,
-      label: `Candidates pruefen (${candidateCount} ausstehend)`,
-      meta: 'Erkannte Vorschlaege bestaetigen oder ablehnen',
+      label: `Candidates prüfen (${candidateCount} ausstehend)`,
+      meta: 'Erkannte Vorschläge bestätigen oder ablehnen',
     },
     {
       href: `/projects/${id}/items`,
       label: `Items bearbeiten (${itemCount} gesamt)`,
-      meta: 'Titel, Zustand und Details fuer das Scoring verfeinern',
+      meta: 'Titel, Zustand und Details für das Scoring verfeinern',
     },
     {
       href: `/projects/${id}/bundles`,
       label: `Bundles (${bundleCount} gesamt)`,
-      meta: 'Guenstige Artikel zu Paketen buendeln und gemeinsam anbieten',
+      meta: 'Günstige Artikel zu Paketen bündeln und gemeinsam anbieten',
     },
     {
       href: `/projects/${id}/listings`,
       label: `Listings (${listingCount} offen)`,
-      meta: 'Entwuerfe pruefen, freigeben und exportieren',
+      meta: 'Entwürfe prüfen, freigeben und exportieren',
     },
   ]
 
@@ -108,7 +108,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </Link>
 
         <header style={{ marginTop: '1.5rem' }}>
-          <p style={{ margin: 0, color: '#7b6f5b' }}>Projektuebersicht</p>
+          <p style={{ margin: 0, color: '#7b6f5b' }}>Projektübersicht</p>
           <h1 style={{ marginTop: '0.5rem', marginBottom: '0.75rem' }}>{project.title}</h1>
           <p style={{ marginTop: 0, color: '#5c5346', lineHeight: 1.6 }}>
             {project.description ?? 'Keine Beschreibung hinterlegt.'}
@@ -118,6 +118,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         <section style={summaryCardStyle}>
           <div style={summaryGridStyle}>
             <StatCard label="Candidates offen" value={candidateCount} />
+
             <StatCard label="Items gesamt" value={itemCount} />
             <StatCard label="Bundles" value={bundleCount} />
             <StatCard label="Listings offen" value={listingCount} />
@@ -126,7 +127,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </section>
 
         <section style={{ marginTop: '2rem' }}>
-          <h2 style={{ marginBottom: '0.75rem' }}>Naechste Schritte</h2>
+          <h2 style={{ marginBottom: '0.75rem' }}>Nächste Schritte</h2>
           <ul style={stepsListStyle}>
             {nextSteps.map((step) => (
               <li key={step.href} style={stepCardStyle}>

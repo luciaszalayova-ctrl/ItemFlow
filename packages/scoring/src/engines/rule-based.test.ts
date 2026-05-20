@@ -22,13 +22,13 @@ describe("RuleBasedScoringEngine", () => {
     expect(["high", "medium"]).toContain(result.confidence);
   });
 
-  it('bewertet 3 Kinderbuecher in Zustand "gut" als bundle', () => {
+  it('bewertet 3 Kinderbücher in Zustand "gut" als bundle', () => {
     const engine = new RuleBasedScoringEngine();
 
     const result = engine.scoreItem({
       item: createItem({
-        title: "3 Kinderbuecher",
-        category: "Buecher",
+        title: "3 Kinderbücher",
+        category: "Bücher",
         brand: null,
         condition: "gut",
         quantity: 3,
@@ -39,7 +39,7 @@ describe("RuleBasedScoringEngine", () => {
     expect(result.action).toBe("bundle");
   });
 
-  it("bewertet ein defektes Geraet mit defects als recycle_dispose", () => {
+  it("bewertet ein defektes Gerät mit defects als recycle_dispose", () => {
     const engine = new RuleBasedScoringEngine();
 
     const result = engine.scoreItem({
@@ -90,7 +90,7 @@ describe("RuleBasedScoringEngine", () => {
     expect(result.expectedPriceCents).toBeLessThan(1000);
   });
 
-  it("respektiert einen Threshold-Override fuer sellMinScore", () => {
+  it("respektiert einen Threshold-Override fürsellMinScore", () => {
     const engine = new RuleBasedScoringEngine();
 
     const result = engine.scoreItem({
@@ -109,13 +109,13 @@ describe("RuleBasedScoringEngine", () => {
     expect(result.action).not.toBe("sell_individually");
   });
 
-  it("scoreBundle() bewertet 3 Kinderbuecher als bundle", () => {
+  it("scoreBundle() bewertet 3 Kinderbücher als bundle", () => {
     const engine = new RuleBasedScoringEngine();
     const items = [
       createItem({
         id: "book-1",
         title: "Kinderbuch 1",
-        category: "Buecher",
+        category: "Bücher",
         quantity: 1,
         condition: "gut",
         defects: null
@@ -123,7 +123,7 @@ describe("RuleBasedScoringEngine", () => {
       createItem({
         id: "book-2",
         title: "Kinderbuch 2",
-        category: "Buecher",
+        category: "Bücher",
         quantity: 1,
         condition: "gut",
         defects: null
@@ -131,7 +131,7 @@ describe("RuleBasedScoringEngine", () => {
       createItem({
         id: "book-3",
         title: "Kinderbuch 3",
-        category: "Buecher",
+        category: "Bücher",
         quantity: 1,
         condition: "gut",
         defects: null
@@ -173,7 +173,7 @@ function createBundle(items: InventoryItem[]): Bundle {
   return {
     id: "bundle-1",
     projectId: "project-1",
-    title: "Kinderbuecher Paket",
+    title: "Kinderbücher Paket",
     itemIds: items.map((item) => item.id),
     rationale: null,
     status: "suggested",

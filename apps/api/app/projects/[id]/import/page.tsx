@@ -27,7 +27,7 @@ Regeln:
 - confidence 0.5-0.7 wenn unsicher (Marke unklar, Zustand unbekannt)
 - rawLabel: genau das was du siehst (z. B. "blauer Koffer mit Raedern")
 - normalizedName: normalisierter Gattungsname (z. B. "Koffer")
-- category: eine von: Elektronik, Spielzeug, Kleidung, Buecher, Haushalt, Werkzeug, Sport, Moebel, Sonstiges
+- category: eine von: Elektronik, Spielzeug, Kleidung, Bücher, Haushalt, Werkzeug, Sport, Möbel, Sonstiges
 
 Optionale Felder:
 - "uncertaintyNotes": "Marke nicht lesbar"
@@ -101,7 +101,7 @@ export default function ChatGptImportPage() {
         }}
       >
         <Link href={`/projects/${projectId}`} style={backLinkStyle}>
-          ← Zurueck zum Projekt
+          ← Zurück zum Projekt
         </Link>
 
         <header style={{ marginTop: '1.5rem' }}>

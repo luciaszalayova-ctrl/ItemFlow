@@ -32,7 +32,7 @@ export async function generateListingDraft(input: {
     description: `Verkaufe ${input.title}.\nZustand: ${input.condition}.\n${input.description}`.trim(),
     priceCents: 500,
     category: input.category,
-    shippingMode: 'Abholung bevorzugt, Versand auf Anfrage moeglich.',
+    shippingMode: 'Abholung bevorzugt, Versand auf Anfrage möglich.',
     pickupOnly: true,
   })
 }

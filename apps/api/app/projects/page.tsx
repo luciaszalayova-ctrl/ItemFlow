@@ -53,7 +53,7 @@ export default async function ProjectsPage() {
             <p style={{ margin: 0, color: '#7b6f5b' }}>ItemFlow</p>
             <h1 style={{ marginTop: '0.5rem', marginBottom: '0.75rem' }}>Meine Projekte</h1>
             <p style={{ marginTop: 0, color: '#5c5346', lineHeight: 1.6 }}>
-              Hier startest du den Upload- und Bewertungs-Flow fuer neue Resale-Projekte.
+              Hier startest du den Upload- und Bewertungs-Flow für neue Resale-Projekte.
             </p>
           </div>
 
@@ -66,7 +66,7 @@ export default async function ProjectsPage() {
           <section style={emptyCardStyle}>
             <h2 style={{ marginTop: 0 }}>Noch keine Projekte</h2>
             <p style={{ marginBottom: 0, lineHeight: 1.6 }}>
-              Lege dein erstes Projekt an, zum Beispiel fuer Keller, Dachboden oder Garage.
+              Lege dein erstes Projekt an, zum Beispiel für Keller, Dachboden oder Garage.
             </p>
           </section>
         ) : (
@@ -97,7 +97,7 @@ export default async function ProjectsPage() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
                     <span style={statusStyle}>{project.status}</span>
                     <Link href={`/projects/${project.id}`} style={textLinkStyle}>
-                      Projekt oeffnen
+                      Projekt öffnen
                     </Link>
                   </div>
                 </div>

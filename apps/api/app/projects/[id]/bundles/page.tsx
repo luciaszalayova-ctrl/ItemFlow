@@ -169,7 +169,7 @@ export default function BundlesPage() {
         }}
       >
         <Link href={`/projects/${projectId}`} style={backLinkStyle}>
-          ← Zurueck zum Projekt
+          ← Zurück zum Projekt
         </Link>
 
         <header style={{ marginTop: '1.5rem' }}>
@@ -310,7 +310,7 @@ export default function BundlesPage() {
           <section style={emptyCardStyle}>
             <h2 style={{ marginTop: 0 }}>Noch keine Daten vorhanden</h2>
             <p style={{ lineHeight: 1.6 }}>
-              Zuerst muessen Items erzeugt werden, bevor du daraus Bundles bauen kannst.
+              Zuerst müssen Items erzeugt werden, bevor du daraus Bundles bauen kannst.
             </p>
           </section>
         ) : bundles.length === 0 ? (

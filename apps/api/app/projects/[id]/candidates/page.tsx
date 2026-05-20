@@ -98,14 +98,14 @@ export default function CandidatesPage() {
         }}
       >
         <Link href={`/projects/${projectId}`} style={backLinkStyle}>
-          ← Zurueck zum Projekt
+          ← Zurück zum Projekt
         </Link>
 
         <header style={{ marginTop: '1.5rem' }}>
           <p style={{ margin: 0, color: '#7b6f5b' }}>Candidates-Review</p>
-          <h1 style={{ marginTop: '0.5rem', marginBottom: '0.75rem' }}>Candidates pruefen</h1>
+          <h1 style={{ marginTop: '0.5rem', marginBottom: '0.75rem' }}>Candidates prüfen</h1>
           <p style={{ marginTop: 0, color: '#5c5346', lineHeight: 1.6 }}>
-            Bestaetige erkannte Artikel oder lehne unpassende Vorschlaege direkt ab.
+            Bestätige erkannte Artikel oder lehne unpassende Vorschläge direkt ab.
           </p>
         </header>
 
@@ -133,7 +133,7 @@ export default function CandidatesPage() {
           <section style={emptyCardStyle}>
             <h2 style={{ marginTop: 0 }}>Keine ausstehenden Candidates</h2>
             <p style={{ lineHeight: 1.6 }}>
-              Alle erkannten Vorschlaege sind bereits verarbeitet. Du kannst jetzt mit den Items
+              Alle erkannten Vorschläge sind bereits verarbeitet. Du kannst jetzt mit den Items
               weiterarbeiten.
             </p>
             <Link href={`/projects/${projectId}/items`} style={primaryLinkStyle}>

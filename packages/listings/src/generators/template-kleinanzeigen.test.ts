@@ -5,13 +5,13 @@ import { GeneratedListingSchema, type Bundle, type InventoryItem } from "@itemfl
 import { TemplateListingGenerator } from "./template-kleinanzeigen.js";
 
 describe("TemplateListingGenerator", () => {
-  it('erzeugt fuer einen Einzelartikel mit Brand einen Titel ab "Bosch"', async () => {
+  it('erzeugt füreinen Einzelartikel mit Brand einen Titel ab "Bosch"', async () => {
     const generator = new TemplateListingGenerator();
 
     const result = await generator.generate({
       targetType: "item",
       item: createItem({
-        title: "Akkuschrauber mit Ladegeraet",
+        title: "Akkuschrauber mit Ladegerät",
         category: "Werkzeug",
         brand: "Bosch"
       }),
@@ -23,7 +23,7 @@ describe("TemplateListingGenerator", () => {
     expect(result.title.startsWith("Bosch")).toBe(true);
   });
 
-  it("erzeugt fuer einen Einzelartikel ohne Brand einen Titel ab item.title", async () => {
+  it("erzeugt füreinen Einzelartikel ohne Brand einen Titel ab item.title", async () => {
     const generator = new TemplateListingGenerator();
     const item = createItem({
       title: "IKEA Kallax Regal",
@@ -58,12 +58,12 @@ describe("TemplateListingGenerator", () => {
     expect(result.description).toContain("Hinweise:");
   });
 
-  it('erzeugt fuer ein Bundle einen Titel mit "(3 Teile)" und listet alle Items auf', async () => {
+  it('erzeugt fürein Bundle einen Titel mit "(3 Teile)" und listet alle Items auf', async () => {
     const generator = new TemplateListingGenerator();
     const items = [
-      createItem({ id: "item-1", title: "Kinderbuch 1", category: "Buecher" }),
-      createItem({ id: "item-2", title: "Kinderbuch 2", category: "Buecher" }),
-      createItem({ id: "item-3", title: "Kinderbuch 3", category: "Buecher" })
+      createItem({ id: "item-1", title: "Kinderbuch 1", category: "Bücher" }),
+      createItem({ id: "item-2", title: "Kinderbuch 2", category: "Bücher" }),
+      createItem({ id: "item-3", title: "Kinderbuch 3", category: "Bücher" })
     ];
 
     const result = await generator.generate({
@@ -101,10 +101,10 @@ describe("TemplateListingGenerator", () => {
     const result = await generator.generate({
       targetType: "item",
       item: createItem({
-        title: "Akkuschrauber mit Ladegeraet",
+        title: "Akkuschrauber mit Ladegerät",
         category: "Werkzeug",
         brand: "Bosch",
-        completeness: "Akkuschrauber und Ladegeraet",
+        completeness: "Akkuschrauber und Ladegerät",
         defects: null
       }),
       platform: "kleinanzeigen",
@@ -142,7 +142,7 @@ function createBundle(items: InventoryItem[]): Bundle {
   return {
     id: "bundle-1",
     projectId: "project-1",
-    title: "Kinderbuecher Paket",
+    title: "Kinderbücher Paket",
     itemIds: items.map((item) => item.id),
     rationale: null,
     status: "suggested",

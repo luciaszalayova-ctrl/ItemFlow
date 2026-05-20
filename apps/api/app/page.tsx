@@ -36,7 +36,7 @@ export default async function HomePage() {
           Eingeloggt als: <strong>{session.user.email}</strong>
         </p>
         <p style={{ lineHeight: 1.6 }}>
-          Die API ist bereit. Von hier aus kannst du die geschuetzten Endpunkte im Browser oder per
+          Die API ist bereit. Von hier aus kannst du die geschützten Endpunkte im Browser oder per
           REST-Client testen.
         </p>
 
@@ -55,7 +55,7 @@ export default async function HomePage() {
             background: '#fffdf8',
           }}
         >
-          <h2 style={{ marginTop: 0 }}>Naechste sinnvolle Endpunkte</h2>
+          <h2 style={{ marginTop: 0 }}>Nächste sinnvolle Endpunkte</h2>
           <ul style={{ marginBottom: 0, paddingLeft: '1.25rem', lineHeight: 1.8 }}>
             {links.map((link) => (
               <li key={link}>

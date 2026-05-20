@@ -124,15 +124,15 @@ export default function ItemsPage() {
         }}
       >
         <Link href={`/projects/${projectId}`} style={backLinkStyle}>
-          ← Zurueck zum Projekt
+          ← Zurück zum Projekt
         </Link>
 
         <header style={{ marginTop: '1.5rem' }}>
           <p style={{ margin: 0, color: '#7b6f5b' }}>Items-Workflow</p>
           <h1 style={{ marginTop: '0.5rem', marginBottom: '0.75rem' }}>Items</h1>
           <p style={{ marginTop: 0, color: '#5c5346', lineHeight: 1.6 }}>
-            Bewerte akzeptierte Items direkt hier und erzeuge im naechsten Schritt passende
-            Listing-Entwuerfe.
+            Bewerte akzeptierte Items direkt hier und erzeuge im nächsten Schritt passende
+            Listing-Entwürfe.
           </p>
         </header>
 
@@ -160,7 +160,7 @@ export default function ItemsPage() {
           <section style={emptyCardStyle}>
             <h2 style={{ marginTop: 0 }}>Noch keine Items</h2>
             <p style={{ lineHeight: 1.6 }}>
-              Zuerst muessen Candidates bestaetigt werden, bevor hier Items auftauchen.
+              Zuerst müssen Candidates bestätigt werden, bevor hier Items auftauchen.
             </p>
             <Link href={`/projects/${projectId}/candidates`} style={primaryLinkStyle}>
               Zu den Candidates
@@ -239,7 +239,7 @@ export default function ItemsPage() {
                               color: '#7a4d00',
                             }}
                           >
-                            Sensible Kategorie — bitte Listing sorgfaeltig pruefen.
+                            Sensible Kategorie — bitte Listing sorgfältig prüfen.
                           </p>
                         ) : null}
                       </section>
@@ -300,7 +300,7 @@ async function readError(response: Response, fallback: string) {
 function formatStatus(status: string) {
   switch (status) {
     case 'ready_for_scoring':
-      return 'Bereit fuer Scoring'
+      return 'Bereit für Scoring'
     case 'listing_created':
       return 'Listing erstellt'
     case 'scored':

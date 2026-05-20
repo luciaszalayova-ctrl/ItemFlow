@@ -143,7 +143,7 @@ export default function NewProjectPage() {
                 fontWeight: 600,
               }}
             >
-              Zurueck zur Liste
+              Zurück zur Liste
             </a>
           </div>
         </form>

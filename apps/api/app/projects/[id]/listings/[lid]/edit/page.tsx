@@ -126,7 +126,7 @@ export default function EditListingPage() {
         }}
       >
         <Link href={`/projects/${projectId}/listings`} style={backLinkStyle}>
-          ← Zurueck zu den Listings
+          ← Zurück zu den Listings
         </Link>
 
         <header style={{ marginTop: '1.5rem' }}>

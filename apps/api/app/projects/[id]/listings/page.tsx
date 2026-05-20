@@ -174,14 +174,14 @@ export default function ListingsPage() {
         }}
       >
         <Link href={`/projects/${projectId}`} style={backLinkStyle}>
-          ← Zurueck zum Projekt
+          ← Zurück zum Projekt
         </Link>
 
         <header style={{ marginTop: '1.5rem' }}>
           <p style={{ margin: 0, color: '#7b6f5b' }}>Listing-Workflow</p>
           <h1 style={{ marginTop: '0.5rem', marginBottom: '0.75rem' }}>Listings</h1>
           <p style={{ marginTop: 0, color: '#5c5346', lineHeight: 1.6 }}>
-            Pruefe erzeugte Entwuerfe, gib passende Listings frei und exportiere sie als JSON fuer
+            Prüfe erzeugte Entwürfe, gib passende Listings frei und exportiere sie als JSON für
             den manuellen Upload.
           </p>
         </header>
@@ -255,7 +255,7 @@ export default function ListingsPage() {
           <section style={emptyCardStyle}>
             <h2 style={{ marginTop: 0 }}>Noch keine Listings</h2>
             <p style={{ lineHeight: 1.6 }}>
-              Zuerst muessen Items bewertet und Listing-Entwuerfe erzeugt werden.
+              Zuerst müssen Items bewertet und Listing-Entwürfe erzeugt werden.
             </p>
             <Link href={`/projects/${projectId}/items`} style={primaryLinkStyle}>
               Zu den Items

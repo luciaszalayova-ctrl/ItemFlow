@@ -78,14 +78,14 @@ export default function UploadPage() {
         }}
       >
         <Link href={`/projects/${projectId}`} style={backLinkStyle}>
-          ← Zurueck zum Projekt
+          ← Zurück zum Projekt
         </Link>
 
         <header style={{ marginTop: '1.5rem' }}>
           <p style={{ margin: 0, color: '#7b6f5b' }}>Bild-Upload</p>
           <h1 style={{ marginTop: '0.5rem', marginBottom: '0.75rem' }}>Foto hochladen</h1>
           <p style={{ marginTop: 0, color: '#5c5346', lineHeight: 1.6 }}>
-            Lade ein einzelnes Bild hoch, damit ItemFlow erste Candidates fuer dieses Projekt
+            Lade ein einzelnes Bild hoch, damit ItemFlow erste Candidates für dieses Projekt
             erkennen kann.
           </p>
         </header>
@@ -143,7 +143,7 @@ export default function UploadPage() {
                 Es wurden <strong>{result.candidateCount}</strong> Candidates erkannt.
               </p>
               <Link href={`/projects/${projectId}/candidates`} style={primaryLinkStyle}>
-                Candidates pruefen
+                Candidates prüfen
               </Link>
             </section>
           ) : null}
