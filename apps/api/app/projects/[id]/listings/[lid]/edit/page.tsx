@@ -21,6 +21,7 @@ export default function EditListingPage() {
   const [listing, setListing] = useState<ListingDraft | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [regenerating, setRegenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
 
@@ -84,6 +85,34 @@ export default function EditListingPage() {
     setListing(data.listing)
     setSaved(true)
     setSaving(false)
+  }
+
+  async function handleRegenerate() {
+    if (!listing) {
+      return
+    }
+
+    if (!confirm('Listing wirklich neu generieren? Manuelle Änderungen gehen verloren.')) {
+      return
+    }
+
+    setRegenerating(true)
+    setError(null)
+
+    const response = await fetch(`/api/projects/${projectId}/listings/${lid}/regenerate`, {
+      method: 'POST',
+    })
+
+    if (!response.ok) {
+      setError(await readError(response, 'Neu generieren fehlgeschlagen.'))
+      setRegenerating(false)
+      return
+    }
+
+    const data = (await response.json()) as { listing: ListingDraft }
+    setListing(data.listing)
+    setSaved(false)
+    setRegenerating(false)
   }
 
   function updateField<K extends keyof ListingDraft>(key: K, value: ListingDraft[K]) {
@@ -278,14 +307,26 @@ export default function EditListingPage() {
               <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                 <button
                   type="submit"
-                  disabled={saving}
+                  disabled={saving || regenerating}
                   style={{
                     ...primaryButtonStyle,
                     background: saving ? '#8d8476' : '#1f6f5f',
-                    cursor: saving ? 'progress' : 'pointer',
+                    cursor: saving || regenerating ? 'progress' : 'pointer',
                   }}
                 >
                   {saving ? 'Speichert...' : 'Aenderungen speichern'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void handleRegenerate()}
+                  disabled={saving || regenerating}
+                  style={{
+                    ...secondaryButtonStyle,
+                    opacity: saving || regenerating ? 0.7 : 1,
+                    cursor: saving || regenerating ? 'progress' : 'pointer',
+                  }}
+                >
+                  {regenerating ? 'Wird generiert...' : 'Neu generieren'}
                 </button>
               </div>
             </form>
@@ -353,6 +394,18 @@ const primaryButtonStyle = {
   padding: '0.85rem 1rem',
   borderRadius: '999px',
   color: '#ffffff',
+  border: 0,
+  fontWeight: 700,
+} satisfies React.CSSProperties
+
+const secondaryButtonStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0.85rem 1rem',
+  borderRadius: '999px',
+  background: '#efe6d6',
+  color: '#4e463b',
   border: 0,
   fontWeight: 700,
 } satisfies React.CSSProperties
