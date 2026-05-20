@@ -9,6 +9,8 @@
     "typecheck": "corepack pnpm -r typecheck",
     "lint": "corepack pnpm -r lint",
     "test": "corepack pnpm -r test",
+    "db:migrate": "corepack pnpm --filter @itemflow/db migrate",
+    "db:seed": "corepack pnpm --filter @itemflow/db seed",
     "format": "prettier --write ."
   },
   "pnpm": {
