@@ -4,6 +4,19 @@ import { auth } from '@/auth'
 
 type RouteContext = { params: Promise<{ id: string }> }
 
+type ExportListing = {
+  id: string
+  title: string
+  description: string
+  priceCents: number
+  minimumPriceCents: number | null
+  category: string | null
+  shippingMode: string | null
+  pickupOnly: boolean
+  status: string
+  targetType: string
+}
+
 const exportSelect = {
   id: true,
   title: true,
@@ -40,7 +53,7 @@ export async function GET(request: Request, context: RouteContext) {
   }
 
   const format = new URL(request.url).searchParams.get('format') ?? 'json'
-  if (format !== 'json') {
+  if (format !== 'json' && format !== 'csv') {
     return Response.json({ error: 'Unsupported format' }, { status: 400 })
   }
 
@@ -52,6 +65,17 @@ export async function GET(request: Request, context: RouteContext) {
     select: exportSelect,
     orderBy: { createdAt: 'asc' },
   })
+
+  if (format === 'csv') {
+    const csv = toCsv(listings)
+    return new Response(csv, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': `attachment; filename="itemflow-export-${id}.csv"`,
+      },
+    })
+  }
 
   return new Response(
     JSON.stringify(
@@ -70,4 +94,42 @@ export async function GET(request: Request, context: RouteContext) {
       },
     },
   )
+}
+
+function toCsv(listings: ExportListing[]): string {
+  const header = [
+    'id',
+    'titel',
+    'beschreibung',
+    'preis_euro',
+    'mindestpreis_euro',
+    'kategorie',
+    'versandmodus',
+    'nur_abholung',
+    'status',
+    'typ',
+  ]
+
+  const rows = listings.map((listing) => [
+    listing.id,
+    escapeCsvField(listing.title),
+    escapeCsvField(listing.description),
+    listing.priceCents != null ? (listing.priceCents / 100).toFixed(2) : '',
+    listing.minimumPriceCents != null ? (listing.minimumPriceCents / 100).toFixed(2) : '',
+    escapeCsvField(listing.category ?? ''),
+    escapeCsvField(listing.shippingMode ?? ''),
+    listing.pickupOnly ? 'ja' : 'nein',
+    listing.status,
+    listing.targetType,
+  ])
+
+  return [header, ...rows].map((row) => row.join(',')).join('\r\n')
+}
+
+function escapeCsvField(value: string): string {
+  if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+    return `"${value.replace(/"/g, '""')}"`
+  }
+
+  return value
 }
