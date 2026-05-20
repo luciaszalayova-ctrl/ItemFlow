@@ -1,4 +1,5 @@
 import type { InventoryItem, Bundle, GeneratedListing, SupportedPlatform } from '@itemflow/shared'
+import { GeneratedListingSchema } from '@itemflow/shared'
 
 export interface ListingGeneratorInput {
   targetType: 'item' | 'bundle'
@@ -18,6 +19,22 @@ export interface ListingGeneratorInput {
 export interface ListingGenerator {
   readonly platform: SupportedPlatform
   generate(input: ListingGeneratorInput): Promise<GeneratedListing>
+}
+
+export async function generateListingDraft(input: {
+  title: string
+  description: string
+  condition: string
+  category: string
+}): Promise<GeneratedListing> {
+  return GeneratedListingSchema.parse({
+    title: input.title,
+    description: `Verkaufe ${input.title}.\nZustand: ${input.condition}.\n${input.description}`.trim(),
+    priceCents: 500,
+    category: input.category,
+    shippingMode: 'Abholung bevorzugt, Versand auf Anfrage moeglich.',
+    pickupOnly: true,
+  })
 }
 
 export type { InventoryItem, Bundle, GeneratedListing, SupportedPlatform }
