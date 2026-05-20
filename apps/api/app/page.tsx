@@ -1,4 +1,5 @@
 import { auth } from '@/auth'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 const links = [
@@ -39,6 +40,12 @@ export default async function HomePage() {
           REST-Client testen.
         </p>
 
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
+          <Link href="/projects" style={primaryLinkStyle}>
+            Zu meinen Projekten
+          </Link>
+        </div>
+
         <section
           style={{
             marginTop: '2rem',
@@ -61,3 +68,15 @@ export default async function HomePage() {
     </main>
   )
 }
+
+const primaryLinkStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0.85rem 1rem',
+  borderRadius: '999px',
+  background: '#1f6f5f',
+  color: '#ffffff',
+  textDecoration: 'none',
+  fontWeight: 700,
+} satisfies React.CSSProperties
