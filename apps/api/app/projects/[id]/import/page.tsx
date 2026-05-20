@@ -136,6 +136,14 @@ export default function ChatGptImportPage() {
               >
                 {promptCopied ? 'Prompt kopiert ✓' : 'Prompt kopieren'}
               </button>
+              <a
+                href={`https://chatgpt.com/?q=${encodeURIComponent(MANUAL_PROMPT)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={secondaryButtonStyle}
+              >
+                In ChatGPT öffnen
+              </a>
               <button
                 type="button"
                 onClick={() => setShowPrompt((current) => !current)}
