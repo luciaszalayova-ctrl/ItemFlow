@@ -55,10 +55,7 @@ export default function LoginPage() {
         }}
       >
         <p style={{ margin: 0, color: '#7b6f5b', fontSize: '0.9rem' }}>ItemFlow</p>
-        <h1 style={{ marginTop: '0.5rem', marginBottom: '0.75rem' }}>Login</h1>
-        <p style={{ marginTop: 0, color: '#5c5346', lineHeight: 1.5 }}>
-          Mit den Dev-Zugangsdaten kannst du den kompletten Flow im Browser testen.
-        </p>
+        <h1 style={{ marginTop: '0.5rem', marginBottom: '1.25rem' }}>Anmelden</h1>
 
         <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem' }}>
           <label style={{ display: 'grid', gap: '0.35rem' }}>
@@ -69,7 +66,6 @@ export default function LoginPage() {
               type="email"
               required
               autoComplete="email"
-              defaultValue="dev@itemflow.local"
               style={inputStyle}
             />
           </label>
@@ -82,7 +78,6 @@ export default function LoginPage() {
               type="password"
               required
               autoComplete="current-password"
-              defaultValue="dev-password"
               style={inputStyle}
             />
           </label>
@@ -119,9 +114,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p style={{ marginTop: '1rem', marginBottom: 0, color: '#7b6f5b', fontSize: '0.9rem' }}>
-          Dev-Login: <code>dev@itemflow.local</code> / <code>dev-password</code>
-        </p>
       </section>
     </main>
   )

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /home/lz/ItemFlow show 679b81c:apps/api/app/projects/\\\\[id\\\\]/listings/\\\\[lid\\\\]/edit/page.tsx)",
+      "Bash(git -C /home/lz/ItemFlow show eead6c4:apps/api/app/projects/\\\\[id\\\\]/items/page.tsx)",
+      "Bash(corepack pnpm *)"
+    ]
+  }
+}
