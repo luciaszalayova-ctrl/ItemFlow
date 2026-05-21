@@ -5,7 +5,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 /** @type {import("next").NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ['@prisma/client', '@prisma/internals'],
+  serverExternalPackages: ['@prisma/client', '@prisma/internals', '@itemflow/db'],
   outputFileTracingRoot: path.join(__dirname, '../../'),
   outputFileTracingIncludes: {
     '/**': [
@@ -14,7 +14,6 @@ const nextConfig = {
   },
   transpilePackages: [
     '@itemflow/shared',
-    '@itemflow/db',
     '@itemflow/scoring',
     '@itemflow/listings',
     '@itemflow/vision',

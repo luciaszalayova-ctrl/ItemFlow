@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3001",
+    "prebuild": "pnpm --filter @itemflow/db build",
     "build": "next build",
     "start": "next start -p 3001",
     "typecheck": "tsc --build tsconfig.json",
